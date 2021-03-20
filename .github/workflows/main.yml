@@ -31,6 +31,10 @@ jobs:
         run: yarn
         working-directory: ./atcoder-marathon-replay-frontend
         
+      - name: Lint
+        run: yarn lint
+        working-directory: ./atcoder-marathon-replay-frontend
+        
       - name: Build
         run: yarn build
         working-directory: ./atcoder-marathon-replay-frontend
