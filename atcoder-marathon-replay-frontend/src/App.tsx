@@ -1,5 +1,5 @@
 import React from 'react';
-import { HashRouter as Router, Switch, Route, Redirect } from 'react-router-dom';
+import { HashRouter as Router, Switch, Route, Redirect, Link } from 'react-router-dom';
 import { Container, Navbar, NavbarBrand } from 'reactstrap';
 import { ChartPage } from "./pages/chart";
 
@@ -8,7 +8,7 @@ function App() {
     <div className="App">
       <Router>
         <Navbar color="light" light expand="lg" fixed="top">
-          <NavbarBrand>AtCoder Marathon Replay</NavbarBrand>
+          <NavbarBrand tag={Link} to={'/'}>AtCoder Marathon Replay</NavbarBrand>
         </Navbar>
         <Container style={{ width: '100%', maxWidth: '90%', marginTop: '80px' }}>
           <Switch>

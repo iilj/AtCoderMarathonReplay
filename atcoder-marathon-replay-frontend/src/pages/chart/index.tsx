@@ -47,7 +47,7 @@ const InnerChartPage: React.FC<InnerProps> = (props) => {
   return (
     <>
       <h2>Description</h2>
-      <p><a href="https://atcoder-replay.kakira.dev/" target="_blank" rel="noopener">AtCoder Replay (β)</a>
+      <p><a href="https://atcoder-replay.kakira.dev/" target="_blank" rel="noreferrer">AtCoder Replay (β)</a>
       がマラソンに対応していなかったので作りました．</p>
 
       <h2>Let's Replay!</h2>
