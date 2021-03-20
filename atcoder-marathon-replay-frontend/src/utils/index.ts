@@ -1,11 +1,13 @@
-
-export const dateToString = (_date: Date, format: string = 'YYYY-MM-DD hh:mm:ss'): string => {
+export const dateToString = (
+  _date: Date,
+  format = 'YYYY-MM-DD hh:mm:ss'
+): string => {
   const year = _date.getFullYear().toString();
-  const month = ('0' + (1 + _date.getMonth())).slice(-2);
-  const date = ('0' + _date.getDate()).slice(-2);
-  const hours = ('0' + _date.getHours()).slice(-2);
-  const minutes = ('0' + _date.getMinutes()).slice(-2);
-  const seconds = ('0' + _date.getSeconds()).slice(-2);
+  const month = `0${1 + _date.getMonth()}`.slice(-2);
+  const date = `0${_date.getDate()}`.slice(-2);
+  const hours = `0${_date.getHours()}`.slice(-2);
+  const minutes = `0${_date.getMinutes()}`.slice(-2);
+  const seconds = `0${_date.getSeconds()}`.slice(-2);
 
   return format
     .replace(/YYYY/g, year)
@@ -13,7 +15,7 @@ export const dateToString = (_date: Date, format: string = 'YYYY-MM-DD hh:mm:ss'
     .replace(/DD/g, date)
     .replace(/hh/g, hours)
     .replace(/mm/g, minutes)
-    .replace(/ss/g, seconds)
+    .replace(/ss/g, seconds);
 };
 
 /**

@@ -1,5 +1,5 @@
-import Submission from "../interfaces/Submission";
-import { BinaryIndexedTree } from "./BinaryIndexedTree";
+import Submission from '../interfaces/Submission';
+import { BinaryIndexedTree } from './BinaryIndexedTree';
 
 class ContestUserState {
   taskScoreMap: Map<string, number>;
@@ -11,11 +11,11 @@ class ContestUserState {
     this.afterTargetUser = false;
   }
   addSubmission(contestSubmission: Submission): void {
-    let val = contestSubmission.score;
+    const val = contestSubmission.score;
     if (this.taskScoreMap.has(contestSubmission.task)) {
       const curVal = this.taskScoreMap.get(contestSubmission.task) as number;
       if (curVal > val) return;
-      this.score += (val - curVal);
+      this.score += val - curVal;
     } else {
       this.score += val;
     }
@@ -37,8 +37,16 @@ export interface RankChartData {
   overtakeUserNewScore?: number;
 }
 
-export const getRankSequence = (user: string, contestSubmissions: Submission[]): RankChartData[] => {
-  if (!contestSubmissions.some((contestSubmission: Submission): boolean => (contestSubmission.user_name === user))) {
+export const getRankSequence = (
+  user: string,
+  contestSubmissions: Submission[]
+): RankChartData[] => {
+  if (
+    !contestSubmissions.some(
+      (contestSubmission: Submission): boolean =>
+        contestSubmission.user_name === user
+    )
+  ) {
     return [] as RankChartData[];
   }
   // assert ユーザがいる
@@ -51,14 +59,18 @@ export const getRankSequence = (user: string, contestSubmissions: Submission[]):
     const userSubmissionsMap = new Map<string, Submission[]>();
     contestSubmissions.forEach((contestSubmission: Submission): void => {
       if (userSubmissionsMap.has(contestSubmission.user_name)) {
-        userSubmissionsMap.get(contestSubmission.user_name)?.push(contestSubmission);
+        userSubmissionsMap
+          .get(contestSubmission.user_name)
+          ?.push(contestSubmission);
       } else {
-        userSubmissionsMap.set(contestSubmission.user_name, [contestSubmission]);
+        userSubmissionsMap.set(contestSubmission.user_name, [
+          contestSubmission,
+        ]);
       }
     });
     userLength = userSubmissionsMap.size;
 
-    userSubmissionsMap.forEach((userSubmissions: Submission[], user_name: string): void => {
+    userSubmissionsMap.forEach((userSubmissions: Submission[]): void => {
       const contestUserState = new ContestUserState();
       userSubmissions.forEach((contestSubmission: Submission): void => {
         contestUserState.addSubmission(contestSubmission);
@@ -91,13 +103,16 @@ export const getRankSequence = (user: string, contestSubmissions: Submission[]):
         tmpUserState.afterTargetUser = true;
         userStateMap.set(contestSubmission.user_name, tmpUserState);
       }
-      const contestUserState = userStateMap.get(contestSubmission.user_name) as ContestUserState;
+      const contestUserState = userStateMap.get(
+        contestSubmission.user_name
+      ) as ContestUserState;
       const oldScore = contestUserState.score;
       // const oldAfterTargetUser = contestUserState.afterTargetUser;
       contestUserState.addSubmission(contestSubmission);
       // contestUserState.afterTargetUser = false;
       const newScore = contestUserState.score;
-      if (newScore !== oldScore) { // スコア更新
+      if (newScore !== oldScore) {
+        // スコア更新
         const oldIndex = compress.get(oldScore) as number;
         const newIndex = compress.get(newScore) as number;
         bit.add(oldIndex, -1);
@@ -121,15 +136,20 @@ export const getRankSequence = (user: string, contestSubmissions: Submission[]):
             // 追い越さなかった
             contestUserState.afterTargetUser = false;
             return;
-          } else if (newScore === curScore) { // 同点になったけど追い越さなかった
+          } else if (newScore === curScore) {
+            // 同点になったけど追い越さなかった
             contestUserState.afterTargetUser = true;
             return;
-          } else { // 追い越したか，あるいは最初から高い順位にいるか
+          } else {
+            // 追い越したか，あるいは最初から高い順位にいるか
             if (oldScore > curScore) {
               // 最初から得点が高い
               contestUserState.afterTargetUser = false;
               return;
-            } else if (oldScore === curScore && !contestUserState.afterTargetUser) {
+            } else if (
+              oldScore === curScore &&
+              !contestUserState.afterTargetUser
+            ) {
               // ターゲットユーザよりも先に今の得点を取っていた
               return;
             }
@@ -154,4 +174,4 @@ export const getRankSequence = (user: string, contestSubmissions: Submission[]):
     });
   }
   return seq;
-}
+};
