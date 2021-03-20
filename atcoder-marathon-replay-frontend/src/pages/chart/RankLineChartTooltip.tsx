@@ -70,13 +70,19 @@ export const RankLineChartTooltip: React.FC<Props> = (props) => {
               {curPayload.type === 'update' ? (
                 <>
                   <div>得点を更新しました:</div>
-                  <div>{`${curPayload.oldScore} → ${curPayload.score} (${curPayload.task} ${curPayload.status})`}</div>
+                  <div>
+                    <span style={{ color: payloadContainer.stroke }}>{curPayload.oldScore}</span>
+                    {' → '}
+                    <span style={{ color: payloadContainer.stroke }}>{curPayload.score}</span>
+                  </div>
+                  <div>{`(${curPayload.task} ${curPayload.status})`}</div>
                 </>
               ) : (
                 <>
                   <div>{`${curPayload.overtakeUserName} さんに追い抜かれました:`}</div>
-                  <div>{`${payloadContainer.name}: ${curPayload.score}`}</div>
-                  <div>{`${curPayload.overtakeUserName}: ${curPayload.overtakeUserOldScore} → ${curPayload.overtakeUserNewScore} (${curPayload.task} ${curPayload.status})`}</div>
+                  <div>{`${payloadContainer.name}: `}<span style={{ color: payloadContainer.stroke }}>{curPayload.score}</span></div>
+                  <div>{`${curPayload.overtakeUserName}: ${curPayload.overtakeUserOldScore} → ${curPayload.overtakeUserNewScore}`}</div>
+                  <div style={{ marginLeft: '1em' }}>{`(${curPayload.task} ${curPayload.status})`}</div>
                 </>
               )}
             </div>

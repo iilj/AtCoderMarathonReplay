@@ -1,17 +1,10 @@
-import React, { useState } from "react";
-import {
-  Input,
-  Row,
-  FormGroup,
-  Label,
-  Col,
-} from "reactstrap";
+import React from "react";
 import { connect, PromiseState } from "react-refetch";
-import { RankLineChart } from "./RankLineChart";
 import { fetchContests, fetchContestSubmissions } from "../../utils/Data";
 import Contest from "../../interfaces/Contest";
 import Submission from "../../interfaces/Submission";
 import { FormBlock } from "./FormBlock";
+import { ChartBlock } from "./ChartBlock";
 
 interface OuterProps {
   match: {
@@ -36,8 +29,6 @@ const InnerChartPage: React.FC<InnerProps> = (props) => {
 
   const paramContest: string = props.match.params.contest ?? "";
   const paramUser: string = props.match.params.user ?? "";
-  const [showDots, setShowDots] = useState(true);
-  const [showACLabels, setShowACLabels] = useState(true);
 
   const users = paramUser.split(',').map(_user => _user.trim()).filter(_user => _user !== '');
 
@@ -53,44 +44,10 @@ const InnerChartPage: React.FC<InnerProps> = (props) => {
       <h2>Let's Replay!</h2>
       <FormBlock paramUsers={paramUser} paramContest={paramContest} contests={contests} />
 
-      <RankLineChart
+      <ChartBlock
         users={users}
         contest={contestMap.get(paramContest)}
-        contestSubmissions={contestSubmissions}
-        showDots={showDots}
-        showACLabels={showACLabels} />
-
-      <h2>Display Options</h2>
-      <p>
-        <Row>
-          <Col sm={12}>
-            <FormGroup style={{ width: '100%' }} check>
-              <Label check>
-                <Input
-                  type="checkbox"
-                  checked={showDots}
-                  onChange={(e) => setShowDots(e.target.checked)}
-                />
-            Show Dots
-          </Label>
-            </FormGroup>
-          </Col>
-        </Row>
-        <Row>
-          <Col sm={12}>
-            <FormGroup style={{ width: '100%' }} check>
-              <Label check>
-                <Input
-                  type="checkbox"
-                  checked={showACLabels}
-                  onChange={(e) => setShowACLabels(e.target.checked)}
-                />
-            Show AC Labels
-          </Label>
-            </FormGroup>
-          </Col>
-        </Row>
-      </p>
+        contestSubmissions={contestSubmissions} />
 
       <h2>補足</h2>
       <p>AHC001 は最終提出のプレテスト得点不明につき，各ユーザの最終提出のスコアは，システス結果 * 50 / 1000 を用いています．</p>
