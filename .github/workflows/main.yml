@@ -23,24 +23,23 @@ jobs:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - uses: actions/checkout@v2
 
-      - name: Change directory
-        run: cd atcoder-marathon-replay-frontend
-
       - name: Setup Node.js
         uses: actions/setup-node@v1
         with:
           node-version: 14.x
       - name: Install dependencies
         run: yarn
+        working-directory: ./atcoder-marathon-replay-frontend
         
       - name: Build
         run: yarn build
+        working-directory: ./atcoder-marathon-replay-frontend
         
       - name: Deploy website
         uses: peaceiris/actions-gh-pages@v3.6.4
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: build
+          publish_dir: atcoder-marathon-replay-frontend/build
 
 # end
 
