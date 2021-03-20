@@ -1,5 +1,5 @@
-import React, { useState } from "react";
-import { TwitterIcon, TwitterShareButton } from "react-share";
+import React, { useState } from 'react';
+import { TwitterIcon, TwitterShareButton } from 'react-share';
 import {
   Input,
   Row,
@@ -9,13 +9,13 @@ import {
   ButtonGroup,
   Button,
   UncontrolledTooltip,
-} from "reactstrap";
-import Contest from "../../interfaces/Contest";
-import Submission from "../../interfaces/Submission";
-import { dateToString } from "../../utils";
-import { getRankSequence, RankChartData } from "../../utils/RankReproducer";
-import { RankLineChart } from "./RankLineChart";
-import { ScoreLineChart } from "./ScoreLineChart";
+} from 'reactstrap';
+import Contest from '../../interfaces/Contest';
+import Submission from '../../interfaces/Submission';
+import { dateToString } from '../../utils';
+import { getRankSequence, RankChartData } from '../../utils/RankReproducer';
+import { RankLineChart } from './RankLineChart';
+import { ScoreLineChart } from './ScoreLineChart';
 
 enum ChartTab {
   'rank' = 0,
@@ -32,37 +32,68 @@ export const ChartBlock: React.FC<Props> = (props) => {
   const { users, contest, contestSubmissions } = props;
 
   const [showDots, setShowDots] = useState<boolean>(true);
-  const [showScoreUpdateLabels, setShowScoreUpdateLabels] = useState<boolean>(true);
+  const [showScoreUpdateLabels, setShowScoreUpdateLabels] = useState<boolean>(
+    true
+  );
   const [activeTab, setActiveTab] = useState<ChartTab>(ChartTab.rank);
 
   if (!contest || users.length === 0) {
-    return (
-      <div style={{ height: '50px' }}></div>
-    );
+    return <div style={{ height: '50px' }}></div>;
   }
   if (contestSubmissions.length === 0) {
     return (
-      <div style={{ width: '100%', height: '500px', textAlign: 'center', marginTop: '100px', marginBottom: '100px' }}>Fetch data...</div>
+      <div
+        style={{
+          width: '100%',
+          height: '500px',
+          textAlign: 'center',
+          marginTop: '100px',
+          marginBottom: '100px',
+        }}
+      >
+        Fetch data...
+      </div>
     );
   }
 
-  const sequences: [string, RankChartData[]][] = users.map(user => [user, getRankSequence(user, contestSubmissions)]);
-  if (sequences.every(entry => entry[1].length === 0)) {
+  const sequences: [string, RankChartData[]][] = users.map((user) => [
+    user,
+    getRankSequence(user, contestSubmissions),
+  ]);
+  if (sequences.every((entry) => entry[1].length === 0)) {
     return (
-      <div style={{ width: '100%', height: '500px', textAlign: 'center', marginTop: '100px', marginBottom: '100px' }}>Invalid UserName</div>
+      <div
+        style={{
+          width: '100%',
+          height: '500px',
+          textAlign: 'center',
+          marginTop: '100px',
+          marginBottom: '100px',
+        }}
+      >
+        Invalid UserName
+      </div>
     );
   }
 
   let maxRankText = '';
   if (sequences.length === 1) {
     const [maxtime, maxrank] = sequences[0][1].reduce(
-      (prev: [number, number], rankChartdata: RankChartData): [number, number] => {
+      (
+        prev: [number, number],
+        rankChartdata: RankChartData
+      ): [number, number] => {
         if (rankChartdata.type !== 'update') return prev;
         const prevRank = prev[1];
         if (prevRank < rankChartdata.rank) return prev;
         return [rankChartdata.time_unix, rankChartdata.rank];
-      }, [-1, contestSubmissions.length] as [number, number]);
-    maxRankText = `\n最大瞬間風速は ${maxrank} 位 (${dateToString(new Date(maxtime * 1000), 'MM/DD hh:mm')}) だよ！`;
+      },
+      [-1, contestSubmissions.length] as [number, number]
+    );
+    maxRankText = `\n最大瞬間風速は ${maxrank} 位 (${dateToString(
+      new Date(maxtime * 1000),
+      'MM/DD hh:mm'
+    )}) だよ！`;
   }
   const tweetTitle = `${users.join(',')}'s replay of ${contest.contest_name}
   ${maxRankText}
@@ -81,7 +112,7 @@ export const ChartBlock: React.FC<Props> = (props) => {
               active={activeTab === ChartTab.rank}
             >
               Rank
-          </Button>
+            </Button>
             <Button
               color="secondary"
               onClick={() => {
@@ -90,33 +121,50 @@ export const ChartBlock: React.FC<Props> = (props) => {
               active={activeTab === ChartTab.score}
             >
               Score
-          </Button>
+            </Button>
           </ButtonGroup>
         </Col>
       </Row>
 
-      <h4 style={{ textAlign: 'center', marginTop: '30px', marginBottom: '-30px' }}>Replay of {contest.contest_name}</h4>
-      {(activeTab === ChartTab.rank) && (
+      <h4
+        style={{
+          textAlign: 'center',
+          marginTop: '30px',
+          marginBottom: '-30px',
+        }}
+      >
+        Replay of {contest.contest_name}
+      </h4>
+      {activeTab === ChartTab.rank && (
         <RankLineChart
           sequences={sequences}
           contest={contest}
           showDots={showDots}
-          showACLabels={showScoreUpdateLabels} />
+          showACLabels={showScoreUpdateLabels}
+        />
       )}
-      {(activeTab === ChartTab.score) && (
+      {activeTab === ChartTab.score && (
         <ScoreLineChart
           sequences={sequences}
           contest={contest}
           showDots={showDots}
-          showACLabels={showScoreUpdateLabels} />
+          showACLabels={showScoreUpdateLabels}
+        />
       )}
 
       <div style={{ textAlign: 'center' }}>
-        <TwitterShareButton url={window.location.href} title={tweetTitle} id='UncontrolledTooltipExample'>
+        <TwitterShareButton
+          url={window.location.href}
+          title={tweetTitle}
+          id="UncontrolledTooltipExample"
+        >
           <TwitterIcon size={40} round />
         </TwitterShareButton>
-        <UncontrolledTooltip placement="top" target="UncontrolledTooltipExample">
-          {(tweetTitle + ' ' + window.location.href).replaceAll("\n", ' ')}
+        <UncontrolledTooltip
+          placement="top"
+          target="UncontrolledTooltipExample"
+        >
+          {(tweetTitle + ' ' + window.location.href).replaceAll('\n', ' ')}
         </UncontrolledTooltip>
       </div>
 
@@ -131,8 +179,8 @@ export const ChartBlock: React.FC<Props> = (props) => {
                   checked={showDots}
                   onChange={(e) => setShowDots(e.target.checked)}
                 />
-            Show Dots
-          </Label>
+                Show Dots
+              </Label>
             </FormGroup>
           </Col>
         </Row>
@@ -145,12 +193,12 @@ export const ChartBlock: React.FC<Props> = (props) => {
                   checked={showScoreUpdateLabels}
                   onChange={(e) => setShowScoreUpdateLabels(e.target.checked)}
                 />
-            Show Score Update Labels
-          </Label>
+                Show Score Update Labels
+              </Label>
             </FormGroup>
           </Col>
         </Row>
       </p>
     </>
-  )
+  );
 };

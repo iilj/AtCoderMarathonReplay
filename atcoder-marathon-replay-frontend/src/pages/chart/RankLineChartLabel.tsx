@@ -1,6 +1,6 @@
-import React from "react";
-import { ordinalSuffixOf } from "../../utils";
-import { RankChartData } from "../../utils/RankReproducer";
+import React from 'react';
+import { ordinalSuffixOf } from '../../utils';
+import { RankChartData } from '../../utils/RankReproducer';
 
 interface Props {
   index?: number;
@@ -37,8 +37,18 @@ export const RankLineChartLabel: React.FC<Props> = (props) => {
           <feComposite in="SourceGraphic" operator="xor" />
         </filter>
       </defs>
-      <text filter={`url(#${fillId})`} x={x} y={y - offset} fontSize={fontSize} fill='none'>{text}</text>
-      <text x={x} y={y - offset} fontSize={fontSize} fill='white'>{text}</text>
+      <text
+        filter={`url(#${fillId})`}
+        x={x}
+        y={y - offset}
+        fontSize={fontSize}
+        fill="none"
+      >
+        {text}
+      </text>
+      <text x={x} y={y - offset} fontSize={fontSize} fill="white">
+        {text}
+      </text>
     </g>
   );
-}
+};

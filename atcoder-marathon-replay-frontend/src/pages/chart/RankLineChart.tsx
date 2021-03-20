@@ -1,10 +1,25 @@
-import React from "react";
-import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, Label, LabelList } from 'recharts';
-import Contest from "../../interfaces/Contest";
-import { getChartLineColor, getDatetimeTickFormatter, getDatetimeTicks } from "../../utils/Chart";
-import { RankChartData } from "../../utils/RankReproducer";
-import { RankLineChartLabel } from "./RankLineChartLabel";
-import { RankLineChartTooltip } from "./RankLineChartTooltip";
+import React from 'react';
+import {
+  LineChart,
+  Line,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  Legend,
+  ResponsiveContainer,
+  Label,
+  LabelList,
+} from 'recharts';
+import Contest from '../../interfaces/Contest';
+import {
+  getChartLineColor,
+  getDatetimeTickFormatter,
+  getDatetimeTicks,
+} from '../../utils/Chart';
+import { RankChartData } from '../../utils/RankReproducer';
+import { RankLineChartLabel } from './RankLineChartLabel';
+import { RankLineChartTooltip } from './RankLineChartTooltip';
 
 interface Props {
   sequences: [string, RankChartData[]][];
@@ -30,39 +45,52 @@ export const RankLineChart: React.FC<Props> = (props) => {
           }}
         >
           <CartesianGrid strokeDasharray="3 3" />
-          <XAxis type="number" dataKey="time_unix" name="unixtime" domain={[contest.start_time_unix, contest.end_time_unix]}
-            tickFormatter={getDatetimeTickFormatter(contest)} ticks={getDatetimeTicks(contest)}>
+          <XAxis
+            type="number"
+            dataKey="time_unix"
+            name="unixtime"
+            domain={[contest.start_time_unix, contest.end_time_unix]}
+            tickFormatter={getDatetimeTickFormatter(contest)}
+            ticks={getDatetimeTicks(contest)}
+          >
             <Label value="Datetime" offset={0} position="insideBottom" />
           </XAxis>
-          <YAxis type="number" name="rank" label={{ value: 'Rank', angle: -90, position: 'insideLeft' }} reversed />
-          <Tooltip
-            content={
-              <RankLineChartTooltip />
-            }
+          <YAxis
+            type="number"
+            name="rank"
+            label={{ value: 'Rank', angle: -90, position: 'insideLeft' }}
+            reversed
           />
+          <Tooltip content={<RankLineChartTooltip />} />
           <Legend />
-          {
-            sequences.map((entry: [string, RankChartData[]], index: number) => {
-              const [user, seq] = entry;
-              const color = getChartLineColor(index);
-              return (
-                <Line
-                  key={user}
-                  data={seq}
-                  name={user} dataKey="rank" type='stepAfter'
-                  stroke={color}
-                  dot={showDots && { fillOpacity: 0.2, strokeWidth: 1 }}>
-                  {showACLabels && (
-                    <LabelList dataKey="label" position="top" content={
+          {sequences.map((entry: [string, RankChartData[]], index: number) => {
+            const [user, seq] = entry;
+            const color = getChartLineColor(index);
+            return (
+              <Line
+                key={user}
+                data={seq}
+                name={user}
+                dataKey="rank"
+                type="stepAfter"
+                stroke={color}
+                dot={showDots && { fillOpacity: 0.2, strokeWidth: 1 }}
+              >
+                {showACLabels && (
+                  <LabelList
+                    dataKey="label"
+                    position="top"
+                    content={
                       <RankLineChartLabel
                         color={color}
-                        rankChartDataSequence={seq} />
-                    } />
-                  )}
-                </Line>
-              );
-            })
-          }
+                        rankChartDataSequence={seq}
+                      />
+                    }
+                  />
+                )}
+              </Line>
+            );
+          })}
         </LineChart>
       </ResponsiveContainer>
     </div>
