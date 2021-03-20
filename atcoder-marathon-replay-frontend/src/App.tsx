@@ -18,7 +18,8 @@ function App() {
           </Switch>
         </Container>
         <footer className="footer" style={{ marginTop: '30px', padding: '30px', backgroundColor: '#efefef' }}>
-          <div className="container">連絡先: <a href="https://twitter.com/iiljj">si (@iiljj) / Twitter</a></div></footer>
+          <div className="container">連絡先: <a href="https://twitter.com/iiljj">si (@iiljj) / Twitter</a>,
+           <a href="https://github.com/iilj">iilj (iilj) / GitHub</a></div></footer>
       </Router>
     </div >
   );

@@ -4,7 +4,7 @@ import sys
 import json
 import sqlite3
 from sqlite3.dbapi2 import Connection, Cursor
-from typing import Dict, List, Set, Union
+from typing import Dict, List, Union
 
 
 def main() -> None:
@@ -22,12 +22,12 @@ def main() -> None:
             'end_time_unix': row[3],
         })
     conn.close()
-    with open('contests.json', mode='wt', encoding='utf-8') as f:
+    with open('../atcoder-marathon-replay-frontend/public/contests/contests.json', mode='wt', encoding='utf-8') as f:
         json.dump(data, f, separators=(',', ':'))
 
 
 if __name__ == '__main__':
     if len(sys.argv) != 1:
-        print('usage: > python export_contests.py')
+        print('usage: $ python export_contests.py')
         exit()
     main()

@@ -60,6 +60,6 @@ def main(contest: str = 'ahc001') -> None:
 
 if __name__ == '__main__':
     if len(sys.argv) != 2:
-        print('usage: > python crawl.py ahc001')
+        print('usage: $ python crawl.py ahc001')
         exit()
     main(sys.argv[1])
