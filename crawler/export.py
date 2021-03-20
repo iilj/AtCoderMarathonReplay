@@ -52,12 +52,12 @@ def main(contest: str = 'ahc001') -> None:
                 if isinstance(d['score'], int) and d['score'] != -1:
                     d['score'] *= 16 / 200
     conn.close()
-    with open(f'{contest}.json', mode='wt', encoding='utf-8') as f:
+    with open(f'../atcoder-marathon-replay-frontend/public/submissions/{contest}.json', mode='wt', encoding='utf-8') as f:
         json.dump(data, f, separators=(',', ':'))
 
 
 if __name__ == '__main__':
     if len(sys.argv) != 2:
-        print('usage: > python export.py ahc001')
+        print('usage: $ python export.py ahc001')
         exit()
     main(sys.argv[1])

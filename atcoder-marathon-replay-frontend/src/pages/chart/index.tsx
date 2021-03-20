@@ -38,6 +38,7 @@ const InnerChartPage: React.FC<InnerProps> = (props) => {
   return (
     <>
       <h2>Description</h2>
+      <p>AtCoder で行われたマラソンコンテストにおける順位および得点の推移をグラフに表示します．</p>
       <p><a href="https://atcoder-replay.kakira.dev/" target="_blank" rel="noreferrer">AtCoder Replay (β)</a>
       がマラソンに対応していなかったので作りました．</p>
 
