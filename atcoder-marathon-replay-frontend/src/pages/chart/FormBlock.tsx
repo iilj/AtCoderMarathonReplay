@@ -1,6 +1,6 @@
 import React, { useState, useMemo } from "react";
 import {
-  NavLink,
+  NavLink, useHistory
 } from "react-router-dom";
 import {
   Button,
@@ -28,6 +28,7 @@ export const FormBlock: React.FC<Props> = (props) => {
   const [contest, setContest] = useState(paramContest !== '' ? paramContest : 'ahc001');
   const [user, setUser] = useState(paramUsers);
   const chartPagePath = useMemo(() => generatePath(contest, user), [contest, user]);
+  const history = useHistory();
 
   return (
     <>
@@ -61,6 +62,11 @@ export const FormBlock: React.FC<Props> = (props) => {
               id="input-user"
               placeholder={user ? user : "user1,user2,..."}
               onChange={(e): void => setUser(e.target.value)}
+              onKeyPress={(e): void => {
+                if (e.key === "Enter") {
+                  history.push(chartPagePath);
+                }
+              }}
             />
           </FormGroup>
         </Col>
