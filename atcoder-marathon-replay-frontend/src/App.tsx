@@ -38,7 +38,8 @@ const App: React.FC = () => {
         >
           <div className="container">
             連絡先:{' '}
-            <a href="https://twitter.com/iiljj">si (@iiljj) / Twitter</a>,
+            <a href="https://twitter.com/iiljj">si (@iiljj) / Twitter</a>
+            {', '}
             <a href="https://github.com/iilj">iilj (iilj) / GitHub</a>
           </div>
         </footer>
