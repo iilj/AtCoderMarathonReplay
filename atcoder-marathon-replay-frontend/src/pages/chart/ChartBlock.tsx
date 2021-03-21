@@ -9,6 +9,7 @@ import {
   ButtonGroup,
   Button,
   UncontrolledTooltip,
+  Alert,
 } from 'reactstrap';
 import Contest from '../../interfaces/Contest';
 import Submission from '../../interfaces/Submission';
@@ -37,8 +38,21 @@ export const ChartBlock: React.FC<Props> = (props) => {
   );
   const [activeTab, setActiveTab] = useState<ChartTab>(ChartTab.rank);
 
-  if (!contest || users.length === 0) {
+  if (!contest) {
     return <div style={{ height: '50px' }}></div>;
+  }
+  if (users.length === 0) {
+    return (
+      <Alert
+        color="danger"
+        style={{
+          marginTop: '50px',
+          marginBottom: '50px',
+        }}
+      >
+        UserName is empty or invalid.
+      </Alert>
+    );
   }
   if (contestSubmissions.length === 0) {
     return (
@@ -62,19 +76,29 @@ export const ChartBlock: React.FC<Props> = (props) => {
   ]);
   if (sequences.every((entry) => entry[1].length === 0)) {
     return (
-      <div
-        style={{
-          width: '100%',
-          height: '500px',
-          textAlign: 'center',
-          marginTop: '100px',
-          marginBottom: '100px',
-        }}
-      >
-        Invalid UserName
-      </div>
+      <>
+        {sequences
+          .map((entry) => entry[0])
+          .map((invalidUser: string) => {
+            return (
+              <Alert
+                key={invalidUser}
+                color="danger"
+                style={{
+                  marginTop: '10px',
+                  marginBottom: '20px',
+                }}
+              >
+                {`UserName ${invalidUser} is not in the data.`}
+              </Alert>
+            );
+          })}
+      </>
     );
   }
+  const invalidUsers: string[] = sequences
+    .filter((entry) => entry[1].length === 0)
+    .map((entry) => entry[0]);
 
   let maxRankText = '';
   if (sequences.length === 1) {
@@ -101,9 +125,24 @@ export const ChartBlock: React.FC<Props> = (props) => {
 
   return (
     <>
+      {invalidUsers.length > 0 &&
+        invalidUsers.map((invalidUser: string) => {
+          return (
+            <Alert
+              key={invalidUser}
+              color="danger"
+              style={{
+                marginTop: '10px',
+                marginBottom: '20px',
+              }}
+            >
+              {`UserName ${invalidUser} is not in the data.`}
+            </Alert>
+          );
+        })}
       <Row style={{ marginTop: '30px' }}>
-        <Col sm={12}>
-          <ButtonGroup className="table-tab">
+        <Col>
+          <ButtonGroup className="form-check-inline">
             <Button
               color="secondary"
               onClick={() => {
@@ -123,6 +162,26 @@ export const ChartBlock: React.FC<Props> = (props) => {
               Score
             </Button>
           </ButtonGroup>
+          <FormGroup check inline>
+            <Label check>
+              <Input
+                type="checkbox"
+                checked={showDots}
+                onChange={(e) => setShowDots(e.target.checked)}
+              />
+              Show Dots
+            </Label>
+          </FormGroup>
+          <FormGroup check inline>
+            <Label check>
+              <Input
+                type="checkbox"
+                checked={showScoreUpdateLabels}
+                onChange={(e) => setShowScoreUpdateLabels(e.target.checked)}
+              />
+              Show Score Update Labels
+            </Label>
+          </FormGroup>
         </Col>
       </Row>
 
@@ -167,38 +226,6 @@ export const ChartBlock: React.FC<Props> = (props) => {
           {(tweetTitle + ' ' + window.location.href).replaceAll('\n', ' ')}
         </UncontrolledTooltip>
       </div>
-
-      <h2>Display Options</h2>
-      <p>
-        <Row>
-          <Col sm={12}>
-            <FormGroup style={{ width: '100%' }} check>
-              <Label check>
-                <Input
-                  type="checkbox"
-                  checked={showDots}
-                  onChange={(e) => setShowDots(e.target.checked)}
-                />
-                Show Dots
-              </Label>
-            </FormGroup>
-          </Col>
-        </Row>
-        <Row>
-          <Col sm={12}>
-            <FormGroup style={{ width: '100%' }} check>
-              <Label check>
-                <Input
-                  type="checkbox"
-                  checked={showScoreUpdateLabels}
-                  onChange={(e) => setShowScoreUpdateLabels(e.target.checked)}
-                />
-                Show Score Update Labels
-              </Label>
-            </FormGroup>
-          </Col>
-        </Row>
-      </p>
     </>
   );
 };
