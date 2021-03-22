@@ -19,7 +19,7 @@ interface Props {
   label?: number;
 }
 
-export const RankLineChartTooltip: React.FC<Props> = (props) => {
+export const LineChartTooltip: React.FC<Props> = (props) => {
   const { active, payload, label } = props;
   if (!active || payload === undefined || label === undefined) return <></>;
   return (

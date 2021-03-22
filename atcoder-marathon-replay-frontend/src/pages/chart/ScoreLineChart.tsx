@@ -19,8 +19,8 @@ import {
   scoreTickFormatter,
 } from '../../utils/Chart';
 import { RankChartData } from '../../utils/RankReproducer';
-import { RankLineChartTooltip } from './RankLineChartTooltip';
-import { ScoreLineChartLabel } from './ScoreLineChartLabel';
+import { LineChartLabel } from './LineChartLabel';
+import { LineChartTooltip } from './LineChartTooltip';
 
 interface Props {
   sequences: [string, RankChartData[]][];
@@ -75,7 +75,7 @@ export const ScoreLineChart: React.FC<Props> = (props) => {
             label={{ value: 'Score', angle: -90, position: 'insideLeft' }}
             tickFormatter={scoreTickFormatter}
           />
-          <Tooltip content={<RankLineChartTooltip />} />
+          <Tooltip content={<LineChartTooltip />} />
           <Legend />
           {scoreUpdateSequences.map(
             (entry: [string, RankChartData[]], index: number) => {
@@ -96,9 +96,13 @@ export const ScoreLineChart: React.FC<Props> = (props) => {
                       dataKey="label"
                       position="top"
                       content={
-                        <ScoreLineChartLabel
+                        <LineChartLabel
                           color={color}
                           rankChartDataSequence={seq}
+                          getText={(data: RankChartData): string =>
+                            `${data.score}`
+                          }
+                          chartId="score"
                         />
                       }
                     />

@@ -12,14 +12,15 @@ import {
   LabelList,
 } from 'recharts';
 import Contest from '../../interfaces/Contest';
+import { ordinalSuffixOf } from '../../utils';
 import {
   getChartLineColor,
   getDatetimeTickFormatter,
   getDatetimeTicks,
 } from '../../utils/Chart';
 import { RankChartData } from '../../utils/RankReproducer';
-import { RankLineChartLabel } from './RankLineChartLabel';
-import { RankLineChartTooltip } from './RankLineChartTooltip';
+import { LineChartLabel } from './LineChartLabel';
+import { LineChartTooltip } from './LineChartTooltip';
 
 interface Props {
   sequences: [string, RankChartData[]][];
@@ -61,7 +62,7 @@ export const RankLineChart: React.FC<Props> = (props) => {
             label={{ value: 'Rank', angle: -90, position: 'insideLeft' }}
             reversed
           />
-          <Tooltip content={<RankLineChartTooltip />} />
+          <Tooltip content={<LineChartTooltip />} />
           <Legend />
           {sequences.map((entry: [string, RankChartData[]], index: number) => {
             const [user, seq] = entry;
@@ -81,9 +82,13 @@ export const RankLineChart: React.FC<Props> = (props) => {
                     dataKey="label"
                     position="top"
                     content={
-                      <RankLineChartLabel
+                      <LineChartLabel
                         color={color}
                         rankChartDataSequence={seq}
+                        getText={(data: RankChartData): string =>
+                          `${data.rank}${ordinalSuffixOf(data.rank)}`
+                        }
+                        chartId="rank"
                       />
                     }
                   />
