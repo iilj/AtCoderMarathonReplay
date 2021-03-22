@@ -1,12 +1,13 @@
 import React from 'react';
-import { connect, PromiseState } from 'react-refetch';
 import { fetchContests, fetchContestSubmissions } from '../../utils/Data';
 import Contest from '../../interfaces/Contest';
 import Submission from '../../interfaces/Submission';
 import { FormBlock } from './FormBlock';
 import { ChartBlock } from './ChartBlock';
+import useSWR from 'swr';
+import { Alert } from 'reactstrap';
 
-interface OuterProps {
+interface Props {
   match: {
     params: {
       contest: string;
@@ -15,29 +16,34 @@ interface OuterProps {
   };
 }
 
-interface InnerProps extends OuterProps {
-  readonly contestsFetch: PromiseState<Contest[]>;
-  readonly contestSubmissionsFetch: PromiseState<Submission[]>;
-}
-
-const InnerChartPage: React.FC<InnerProps> = (props) => {
-  const { contestsFetch, contestSubmissionsFetch } = props;
-  const contests: Contest[] = contestsFetch.fulfilled
-    ? contestsFetch.value
-    : [];
-  const contestSubmissions: Submission[] = contestSubmissionsFetch.fulfilled
-    ? contestSubmissionsFetch.value
-    : [];
-
+export const ChartPage: React.FC<Props> = (props) => {
   const paramContest: string = props.match.params.contest ?? '';
   const paramUser: string = props.match.params.user ?? '';
+
+  const { data: contests, error: contestsError } = useSWR<Contest[], Error>(
+    '/contests/contests',
+    fetchContests
+  );
+
+  const contestSubmissionsSWRResponse = useSWR<Submission[], Error>(
+    paramUser.length > 0 && paramContest.length > 0
+      ? `/submissions/${paramContest}`
+      : null,
+    () => {
+      return fetchContestSubmissions(paramContest);
+    }
+  );
+  const contestSubmissions: Submission[] | undefined =
+    contestSubmissionsSWRResponse.data;
+  const contestSubmissionsError: Error | undefined =
+    contestSubmissionsSWRResponse.error;
 
   const users = paramUser
     .split(',')
     .map((_user) => _user.trim())
     .filter((_user) => _user !== '');
 
-  const contestMap = contests.reduce(
+  const contestMap = contests?.reduce(
     (prevMap: Map<string, Contest>, contest: Contest): Map<string, Contest> =>
       prevMap.set(contest.contest_slug, contest),
     new Map<string, Contest>()
@@ -56,22 +62,72 @@ const InnerChartPage: React.FC<InnerProps> = (props) => {
           rel="noreferrer"
         >
           AtCoder Replay (β)
-        </a>
+        </a>{' '}
         がマラソンに対応していなかったので作りました．
       </p>
 
       <h2>Let&apos;s Replay!</h2>
-      <FormBlock
-        paramUsers={paramUser}
-        paramContest={paramContest}
-        contests={contests}
-      />
+      {contestsError ? (
+        <Alert
+          color="danger"
+          style={{
+            marginTop: '50px',
+            marginBottom: '50px',
+          }}
+        >
+          Failed to fetch contest list.
+        </Alert>
+      ) : contests === undefined ? (
+        <div
+          style={{
+            width: '100%',
+            height: '500px',
+            textAlign: 'center',
+            marginTop: '100px',
+            marginBottom: '100px',
+          }}
+        >
+          Fetch contest data...
+        </div>
+      ) : (
+        <FormBlock
+          paramUsers={paramUser}
+          paramContest={paramContest}
+          contests={contests}
+        />
+      )}
 
-      <ChartBlock
-        users={users}
-        contest={contestMap.get(paramContest)}
-        contestSubmissions={contestSubmissions}
-      />
+      {paramUser.length === 0 ? (
+        <div style={{ height: '50px' }}></div>
+      ) : contestSubmissionsError ? (
+        <Alert
+          color="danger"
+          style={{
+            marginTop: '50px',
+            marginBottom: '50px',
+          }}
+        >
+          Failed to fetch contest submission list.
+        </Alert>
+      ) : contestSubmissions === undefined ? (
+        <div
+          style={{
+            width: '100%',
+            height: '500px',
+            textAlign: 'center',
+            marginTop: '100px',
+            marginBottom: '100px',
+          }}
+        >
+          Fetch contest submissions data...
+        </div>
+      ) : (
+        <ChartBlock
+          users={users}
+          contest={contestMap?.get(paramContest)}
+          contestSubmissions={contestSubmissions}
+        />
+      )}
 
       <h2>補足</h2>
       <p>
@@ -87,15 +143,3 @@ const InnerChartPage: React.FC<InnerProps> = (props) => {
     </>
   );
 };
-
-export const ChartPage = connect<InnerProps>((props) => {
-  return {
-    contestsFetch: {
-      value: fetchContests(),
-    },
-    contestSubmissionsFetch: {
-      comparison: [props.match.params.contest],
-      value: fetchContestSubmissions(props.match.params.contest),
-    },
-  };
-})(InnerChartPage);
