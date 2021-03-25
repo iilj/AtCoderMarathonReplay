@@ -1,11 +1,11 @@
 import React from 'react';
-import { fetchContests, fetchContestSubmissions } from '../../utils/Data';
-import Contest from '../../interfaces/Contest';
-import Submission from '../../interfaces/Submission';
-import { FormBlock } from './FormBlock';
-import { ChartBlock } from './ChartBlock';
 import useSWR from 'swr';
 import { Alert } from 'reactstrap';
+import Contest from '../../interfaces/Contest';
+import Submission from '../../interfaces/Submission';
+import { fetchContests, fetchContestSubmissions } from '../../utils/Data';
+import { FormBlock } from './FormBlock';
+import { ChartBlock } from './ChartBlock';
 
 interface Props {
   match: {
@@ -25,7 +25,10 @@ export const ChartPage: React.FC<Props> = (props) => {
     fetchContests
   );
 
-  const contestSubmissionsSWRResponse = useSWR<Submission[], Error>(
+  const { data: contestSubmissions, error: contestSubmissionsError } = useSWR<
+    Submission[],
+    Error
+  >(
     paramUser.length > 0 && paramContest.length > 0
       ? `/submissions/${paramContest}`
       : null,
@@ -33,10 +36,6 @@ export const ChartPage: React.FC<Props> = (props) => {
       return fetchContestSubmissions(paramContest);
     }
   );
-  const contestSubmissions: Submission[] | undefined =
-    contestSubmissionsSWRResponse.data;
-  const contestSubmissionsError: Error | undefined =
-    contestSubmissionsSWRResponse.error;
 
   const users = paramUser
     .split(',')
@@ -131,15 +130,17 @@ export const ChartPage: React.FC<Props> = (props) => {
 
       <h2>補足</h2>
       <p>
-        AHC001
-        は最終提出のプレテスト得点不明につき，各ユーザの最終提出のスコアは，システス結果
-        * 50 / 1000 を用いています．
+        以下のコンテストの問題に対する提出は，各ユーザの最終提出のプレテスト得点が不明であるため，システムテストの得点に下記の倍率を掛けた値を用いています．
       </p>
-      <p>
-        日立北大2020
-        は最終提出のプレテスト得点不明につき，各ユーザの最終提出のスコアは，システス結果
-        * 16 / 200 を用いています．
-      </p>
+      <ul>
+        <li>ahc001: 50 / 1000</li>
+        <li>hokudai-hitachi2020: 16 / 200</li>
+        <li>hokudai-hitachi2019-2: 30 / 100</li>
+        <li>hokudai-hitachi2019-1: 30 / 100</li>
+        <li>hokudai-hitachi2018: 15 / 100</li>
+        <li>hokudai-hitachi2017-2: 30 / 150</li>
+        <li>hokudai-hitachi2017-1: 30 / 150</li>
+      </ul>
     </>
   );
 };

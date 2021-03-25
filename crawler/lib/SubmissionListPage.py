@@ -24,6 +24,7 @@ class SubmissionListPage:
         lang_name: str
         lang_id: int
         score: int
+        magnification: int
         submission_id: int
         source_length: int
         status: SubmissionStatus
@@ -32,6 +33,7 @@ class SubmissionListPage:
 
         task_href_pattern: Pattern[str] = re.compile(r'/contests/([^/]+)/tasks/([^/]+)')
         user_href_pattern: Pattern[str] = re.compile(r'/users/([^/]+)')
+        score_href_pattern: Pattern[str] = re.compile(r'(-?\d+)\.(\d+)')
 
         def __init__(self, table_row: Tag) -> None:
             """提出一覧ページ内のテーブルのある行タグから，提出インスタンスを初期化する．
@@ -63,7 +65,20 @@ class SubmissionListPage:
             lang_url_query_dict: Dict[str, List[str]] = parse_qs(lang_url_parse_result.query)
             self.lang_id = int(lang_url_query_dict['f.Language'][0])
 
-            self.score: int = int(table_data_list[4].get_text())
+            score_str: str = table_data_list[4].get_text()
+            score_href_match: Optional[Match[str]] = self.score_href_pattern.search(score_str)
+            if score_href_match is not None:
+                score_fst: int = int(score_href_match.group(1))
+                score_snd_str: str = score_href_match.group(2)
+                score_snd: int = int(score_snd_str)
+                self.magnification = pow(10, len(score_snd_str))
+                if score_fst >= 0:
+                    self.score = score_fst * self.magnification + score_snd
+                else:
+                    self.score = score_fst * self.magnification - score_snd
+            else:
+                self.score: int = int(table_data_list[4].get_text())
+                self.magnification = 1
             self.submission_id = int(table_data_list[4]['data-id'])
 
             source_length_str: str = table_data_list[5].get_text()
@@ -72,7 +87,7 @@ class SubmissionListPage:
             status_span: Tag = table_data_list[6].find('span')
             self.status = self.__str_to_status(status_span.get_text())
 
-            if self.status != 'CE' and self.status != 'WJ' and self.status != 'WR':
+            if self.status != 'CE' and self.status != 'IE' and self.status != 'WJ' and self.status != 'WR':
                 time_consumption_str: str = table_data_list[7].get_text()
                 self.time_consumption = int(time_consumption_str.split(' ')[0])
 
@@ -85,7 +100,7 @@ class SubmissionListPage:
         def __repr__(self) -> str:
             return ('<Submission '
                     f'time={self.time}, user={self.user_name}, contest={self.contest}, task={self.task}, '
-                    f'lang={self.lang_name}, lang_id={self.lang_id}, score={self.score}, '
+                    f'lang={self.lang_name}, lang_id={self.lang_id}, score={self.score}, magnification={self.magnification}, '
                     f'submission_id={self.submission_id}, source_length={self.source_length}, status={self.status}, '
                     f'time_consumption={self.time_consumption}, memory_consumption={self.memory_consumption}>')
 
