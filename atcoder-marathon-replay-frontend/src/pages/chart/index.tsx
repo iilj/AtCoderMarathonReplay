@@ -133,7 +133,13 @@ export const ChartPage: React.FC<Props> = (props) => {
         以下のコンテストの問題に対する提出は，各ユーザの最終提出のプレテスト得点が不明であるため，システムテストの得点に下記の倍率を掛けた値を用いています．
       </p>
       <ul>
-        <li>ahc001: 50 / 1000</li>
+        <li>
+          <del>ahc001: 50 / 1000</del> →{' '}
+          <a href="https://www.dropbox.com/s/rqrlprp0zoyi4di/result_ahc001.csv?dl=0">
+            result_ahc001.csv
+          </a>{' '}
+          から Provisional Score を取り込みました．
+        </li>
         <li>hokudai-hitachi2020: 16 / 200</li>
         <li>hokudai-hitachi2019-2: 30 / 100</li>
         <li>hokudai-hitachi2019-1: 30 / 100</li>

@@ -5,12 +5,13 @@ import json
 import sqlite3
 from sqlite3.dbapi2 import Connection, Cursor
 from typing import Dict, List, Set, Tuple, Union
+from lib.AHCResultCSV import AHCProvisionalScores
 
 
 score_fix_ratio: Dict[str, Dict[str, float]] = {
-    'ahc001': {
-        'ahc001_a': 50 / 1000
-    },
+    # 'ahc001': {
+    #     'ahc001_a': 50 / 1000
+    # },
     'hokudai-hitachi2020': {
         'hokudai_hitachi2020_a': 16 / 200,
         'hokudai_hitachi2020_b': 16 / 200,
@@ -64,13 +65,18 @@ def export_submissions(cur: Cursor, contest: str = 'ahc001') -> None:
             if submission_id > user_last_submission_id_map[key]:
                 user_last_submission_id_map[key] = submission_id
     last_submission_id_set: Set[int] = set(user_last_submission_id_map.values())
-    # for ahc001, etc
-    if contest in score_fix_ratio:
+    # for ahc001
+    if contest == 'ahc001':
+        provisional_score_mapper = AHCProvisionalScores('./lib/result_ahc001.csv')
+        data = provisional_score_mapper.fix_data(data, last_submission_id_set)
+    # for hokudai-hitachi2020, etc
+    elif contest in score_fix_ratio:
         problems: Dict[str, float] = score_fix_ratio[contest]
         for d in data:  # for all submissions
             if not (d['submission_id'] in last_submission_id_set):
                 continue
             # assert d['submission_id'] in last_submission_id_set
+            assert isinstance(d['task'], str)
             if not (d['task'] in problems):
                 continue
             # assert d['task'] in problems
@@ -107,6 +113,7 @@ def main() -> None:
     # print(contests)
 
     for contest in contests:
+        assert isinstance(contest['contest_slug'], str)
         contest_slug: str = contest['contest_slug']
         print(f'export submissions of {contest_slug} ({contest["contest_name"]})')
         export_submissions(cur, contest_slug)
