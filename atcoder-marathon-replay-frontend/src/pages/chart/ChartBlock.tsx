@@ -119,9 +119,10 @@ export const ChartBlock: React.FC<Props> = (props) => {
       'mm/dd HH:MM'
     )}) だよ！`;
   }
-  const tweetTitle = `${users.join(',')}'s replay of ${contest.contest_name}
-  ${maxRankText}
-  AtCoder Marathon Replay`;
+  const tweetTitle =
+    `${users.join(',')}'s replay of ${contest.contest_name}\n` +
+    `${maxRankText}\n` +
+    `AtCoder Marathon Replay`;
 
   return (
     <>

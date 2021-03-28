@@ -60,9 +60,21 @@ const App: React.FC = () => {
           >
             <div className="container">
               連絡先:{' '}
-              <a href="https://twitter.com/iiljj">si (@iiljj) / Twitter</a>
+              <a
+                href="https://twitter.com/iiljj"
+                target="_blank"
+                rel="noreferrer noopener"
+              >
+                si (@iiljj) / Twitter
+              </a>
               {', '}
-              <a href="https://github.com/iilj">iilj (iilj) / GitHub</a>
+              <a
+                href="https://github.com/iilj"
+                target="_blank"
+                rel="noreferrer noopener"
+              >
+                iilj (iilj) / GitHub
+              </a>
             </div>
           </footer>
         </Router>

@@ -17,6 +17,8 @@ import Submission from '../../interfaces/Submission';
 import './standings-table.css';
 import { formatScore, formatElapsedSec } from '../../utils';
 import Task from '../../interfaces/Task';
+import { TwitterIcon, TwitterShareButton } from 'react-share';
+import { UncontrolledTooltip } from 'reactstrap';
 
 interface UserStandingsTaskEntry {
   score: number;
@@ -208,7 +210,12 @@ export const StandingsTable: React.FC<Props> = (props) => {
       formatter: function _formatter(cell: string) {
         return (
           <>
-            <a href={`https://atcoder.jp/users/${cell}`} className="username">
+            <a
+              href={`https://atcoder.jp/users/${cell}`}
+              className="username"
+              target="_blank"
+              rel="noreferrer noopener"
+            >
               <span className="user">{cell}</span>
             </a>
           </>
@@ -336,6 +343,8 @@ export const StandingsTable: React.FC<Props> = (props) => {
               <>
                 <a
                   href={`https://atcoder.jp/contests/${task.contest_slug}/tasks/${task.task_slug}`}
+                  target="_blank"
+                  rel="noreferrer noopener"
                 >
                   {column.text}
                 </a>
@@ -369,6 +378,21 @@ export const StandingsTable: React.FC<Props> = (props) => {
     ), // end map
   ];
 
+  let maxRankText = '';
+  if (userStandingsEntries.length > 0) {
+    maxRankText = `\n1位は ${
+      userStandingsEntries[0].user_name
+    } さん (${formatScore(userStandingsEntries[0].score)} 点) だよ！`;
+  }
+
+  const tweetTitle =
+    `Replay of ${contest.contest_name} at ${dataFormat(
+      parsedDatetime,
+      'yyyy-mm-dd HH:MM:ss'
+    )}\n` +
+    `${maxRankText}\n` +
+    `AtCoder Marathon Replay`;
+
   return (
     <>
       <h4
@@ -396,6 +420,21 @@ export const StandingsTable: React.FC<Props> = (props) => {
         filter={filterFactory()}
         wrapperClasses="table-responsive"
       />
+      <div style={{ textAlign: 'center' }}>
+        <TwitterShareButton
+          url={window.location.href}
+          title={tweetTitle}
+          id="UncontrolledTooltipExample"
+        >
+          <TwitterIcon size={40} round />
+        </TwitterShareButton>
+        <UncontrolledTooltip
+          placement="top"
+          target="UncontrolledTooltipExample"
+        >
+          {(tweetTitle + ' ' + window.location.href).replaceAll('\n', ' ')}
+        </UncontrolledTooltip>
+      </div>
     </>
   );
 };
