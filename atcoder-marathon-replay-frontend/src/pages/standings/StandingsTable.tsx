@@ -5,6 +5,12 @@ import BootstrapTable, {
 } from 'react-bootstrap-table-next';
 import paginationFactory from 'react-bootstrap-table2-paginator';
 import filterFactory, { textFilter } from 'react-bootstrap-table2-filter';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import {
+  faSort,
+  faSortDown,
+  faSortUp,
+} from '@fortawesome/free-solid-svg-icons';
 import Contest from '../../interfaces/Contest';
 import Submission from '../../interfaces/Submission';
 import './standings-table.css';
@@ -18,15 +24,53 @@ interface UserStandingsTaskEntry {
   submit_count_ce: number;
 }
 
-interface UserStandingsEntry {
+interface UserStandingsEntry extends UserStandingsTaskEntry {
   user_name: string;
-  score: number;
-  score_time: number;
-  submit_count: number; // CE 以外の提出回数
-  submit_count_ce: number;
   rank: number;
   tasks: Map<string, UserStandingsTaskEntry>; // 問題ごとの得点
 }
+
+const compareUserStandingsTaskEntry = (
+  a: UserStandingsTaskEntry,
+  b: UserStandingsTaskEntry
+): number => {
+  // スコアが高いほうが順位が上
+  if (a.score != b.score) return b.score - a.score;
+  if (a.score > 0) {
+    // 正の得点同士なら
+    if (a.score_time != b.score_time) return a.score_time - b.score_time;
+    return a.submit_count - b.submit_count;
+  } else {
+    // 0 点同士なら
+    return 0;
+  }
+};
+
+const _sortCaret = (order: 'asc' | 'desc' | undefined): JSX.Element => {
+  if (order === 'asc')
+    return (
+      <FontAwesomeIcon
+        style={{
+          marginLeft: '6px',
+          marginTop: '0.2rem',
+          marginBottom: '-0.2rem',
+        }}
+        icon={faSortUp}
+      />
+    );
+  if (order === 'desc')
+    return (
+      <FontAwesomeIcon
+        style={{
+          marginLeft: '6px',
+          marginTop: '-0.2rem',
+          marginBottom: '0.2rem',
+        }}
+        icon={faSortDown}
+      />
+    );
+  return <FontAwesomeIcon style={{ marginLeft: '6px' }} icon={faSort} />;
+};
 
 interface Props {
   contest?: Contest;
@@ -111,27 +155,7 @@ export const StandingsTable: React.FC<Props> = (props) => {
   const userStandingsEntries: UserStandingsEntry[] = Array.from(
     userStandingsEntriesMap.values()
   );
-  userStandingsEntries.sort(
-    (a: UserStandingsEntry, b: UserStandingsEntry): number => {
-      // スコアが高いほうが順位が上
-      if (a.score != b.score) return b.score - a.score;
-      if (a.score > 0) {
-        // 正の得点同士なら
-        if (a.score_time != b.score_time) return a.score_time - b.score_time;
-        return a.submit_count - b.submit_count;
-      } else {
-        // 0 点同士なら
-        // WA が順位表上は上位になり，CE だけの人は後ろに回される
-        // const is_wa_a = a.submit_count > 0;
-        // const is_wa_b = b.submit_count > 0;
-        // if (is_wa_a == is_wa_b) return 0;
-        // if (is_wa_a) return -1;
-        // return 1;
-        return 0;
-      }
-    }
-  );
-  // TODO: 同じ順位に対応する
+  userStandingsEntries.sort(compareUserStandingsTaskEntry);
   userStandingsEntries.reduce((prev, userStandingsEntry, index) => {
     if (prev === -1) {
       userStandingsEntry.rank = index + 1;
@@ -159,13 +183,14 @@ export const StandingsTable: React.FC<Props> = (props) => {
       sort: true,
       classes: 'standings-rank',
       headerClasses: 'standings-rank-head',
-      sortFunc: function sortFunc(a: number, b: number, order: SortOrder) {
+      sortFunc: function _sortFunc(a: number, b: number, order: SortOrder) {
         if (order === 'desc') {
           return a - b;
         } else {
           return b - a;
         }
       },
+      sortCaret: _sortCaret,
     },
     {
       dataField: 'user_name',
@@ -183,7 +208,7 @@ export const StandingsTable: React.FC<Props> = (props) => {
           </>
         );
       },
-      sortFunc: function sortFunc(a: string, b: string, order: SortOrder) {
+      sortFunc: function _sortFunc(a: string, b: string, order: SortOrder) {
         // console.log(order, a > b);
         if (order === 'desc') {
           return a > b ? 1 : -1;
@@ -191,6 +216,7 @@ export const StandingsTable: React.FC<Props> = (props) => {
           return b < a ? -1 : 1;
         }
       },
+      sortCaret: _sortCaret,
     },
     {
       dataField: 'score',
@@ -228,7 +254,7 @@ export const StandingsTable: React.FC<Props> = (props) => {
         );
       },
       formatExtraData: contest,
-      sortFunc: function sortFunc(
+      sortFunc: function _sortFunc(
         _a: number,
         _b: number,
         order: SortOrder,
@@ -237,29 +263,12 @@ export const StandingsTable: React.FC<Props> = (props) => {
         rowB: UserStandingsEntry
       ) {
         if (order === 'desc') {
-          if (rowA.score != rowB.score) return rowB.score - rowA.score;
-          if (rowA.score > 0) {
-            // 正の得点同士なら
-            if (rowA.score_time != rowB.score_time)
-              return rowA.score_time - rowB.score_time;
-            return rowA.submit_count - rowB.submit_count;
-          } else {
-            // 0 点同士なら
-            return 0;
-          }
+          return compareUserStandingsTaskEntry(rowA, rowB);
         } else {
-          if (rowA.score != rowB.score) return rowA.score - rowB.score;
-          if (rowA.score > 0) {
-            // 正の得点同士なら
-            if (rowA.score_time != rowB.score_time)
-              return rowB.score_time - rowA.score_time;
-            return rowB.submit_count - rowA.submit_count;
-          } else {
-            // 0 点同士なら
-            return 0;
-          }
+          return compareUserStandingsTaskEntry(rowB, rowA);
         }
       },
+      sortCaret: _sortCaret,
     },
     ...contestTasks.map(
       (task: Task): ColumnDescription => {
@@ -329,7 +338,7 @@ export const StandingsTable: React.FC<Props> = (props) => {
               </>
             );
           },
-          sortFunc: function sortFunc(
+          sortFunc: function _sortFunc(
             _a: null,
             _b: null,
             order: SortOrder,
@@ -344,34 +353,15 @@ export const StandingsTable: React.FC<Props> = (props) => {
               task.task_slug
             ) as UserStandingsTaskEntry;
             if (order === 'desc') {
-              if (entryA.score != entryB.score)
-                return entryB.score - entryA.score;
-              if (entryA.score > 0) {
-                // 正の得点同士なら
-                if (entryA.score_time != entryB.score_time)
-                  return entryA.score_time - entryB.score_time;
-                return entryA.submit_count - entryB.submit_count;
-              } else {
-                // 0 点同士なら
-                return 0;
-              }
+              return compareUserStandingsTaskEntry(entryA, entryB);
             } else {
-              if (entryA.score != entryB.score)
-                return entryA.score - entryB.score;
-              if (entryA.score > 0) {
-                // 正の得点同士なら
-                if (entryA.score_time != entryB.score_time)
-                  return entryB.score_time - entryA.score_time;
-                return entryB.submit_count - entryA.submit_count;
-              } else {
-                // 0 点同士なら
-                return 0;
-              }
+              return compareUserStandingsTaskEntry(entryB, entryA);
             }
           },
+          sortCaret: _sortCaret,
         };
       }
-    ),
+    ), // end map
   ];
 
   return (
