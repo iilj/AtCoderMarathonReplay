@@ -1,15 +1,16 @@
 # Author: iilj
 
-from datetime import timedelta
-from lib.ContestListPage import ContestListPage
-from lib.ContestListPageRequestResult import ContestListPageRequestResult
 # import sys
 import time
 import sqlite3
+from datetime import timedelta
 from sqlite3.dbapi2 import Connection, Cursor
 from typing import List, Optional, Set, Tuple
 
+from lib.ContestListPage import ContestListPage
+from lib.ContestListPageRequestResult import ContestListPageRequestResult
 from lib.SubmissionListPageRequestResult import DBInsertData, SubmissionListPageRequestResult
+from lib.TaskListPageRequestResult import TaskDBInsertData, TaskListPageRequestResult
 
 
 def crawl_contest(conn: Connection, cur: Cursor, contest: ContestListPage.Contest) -> None:
@@ -79,6 +80,27 @@ def crawl_contest(conn: Connection, cur: Cursor, contest: ContestListPage.Contes
     conn.commit()
 
 
+def crawl_task(conn: Connection, cur: Cursor, contest: ContestListPage.Contest) -> bool:
+    slug: str = contest.contest_slug
+    cur.execute('SELECT COUNT(*) FROM tasks WHERE contest_slug = ?', (slug,))
+    count_result = cur.fetchone()
+    exists_in_table = (count_result[0] > 0)
+    if exists_in_table:
+        print(f' -> There already exists in table')
+        return False
+
+    tlprr: TaskListPageRequestResult = TaskListPageRequestResult.create_from_request(slug)
+    if tlprr.is_closed:
+        print(f' -> Task list: 404')
+        return True
+    print(f' -> Task size: {len(tlprr.task_list_page.tasks)}')
+    seq_of_parameters: List[TaskDBInsertData] = tlprr.generate_insert_data()
+    cur.executemany('INSERT INTO tasks VALUES (?,?,?,'
+                    '?,?,?)', seq_of_parameters)
+    conn.commit()
+    return True
+
+
 def crawl(conn: Connection, cur: Cursor) -> None:
     clprr: ContestListPageRequestResult = ContestListPageRequestResult.create_from_request()
     # slugs: List[str] = [contest.contest_slug for contest in clprr.contest_list_page.contests]
@@ -89,7 +111,9 @@ def crawl(conn: Connection, cur: Cursor) -> None:
         if contest.contest_slug in slugs_crawled:
             continue
         print(f'[START {contest.contest_slug}]')
-        crawl_contest(conn, cur, contest)
+        if crawl_task(conn, cur, contest):
+            time.sleep(5)
+        # crawl_contest(conn, cur, contest)
         print(f'[END {contest.contest_slug}]')
         time.sleep(10)
 

@@ -1,0 +1,59 @@
+/* テーブル全体設定 */
+.table-standings {
+    font-size: 14px;
+    margin-top: 30px;
+}
+.table-standings.table-striped tbody tr:nth-of-type(odd) {
+    background-color: #f9f9f9;
+}
+.react-bootstrap-table table {
+    table-layout: auto;
+  }
+/* セル全体設定 */
+.th-center thead th {
+    text-align: center;
+}
+.th-middle thead th {
+    vertical-align: middle;
+}
+.td-center td{
+    text-align: center;
+}
+.td-middle td {
+    vertical-align: middle;
+}
+
+/* ヘッダ */
+.standings-rank-head {
+    width: 80px;
+}
+.standings-username-head {
+    min-width: 140px;
+}
+.standings-result-head {
+    min-width: 140px;
+}
+
+/* セル個別設定 */
+.username > span {
+    font-weight: bold;
+}
+.standings-result {
+    padding: 0 !important;
+}
+.standings-result p {
+    margin: 0 0 3px;
+    color: #888;
+    font-size: 90%;
+}
+.standings-score {
+    color: #0000FF;
+    font-weight: bold;
+}
+.standings-ac {
+    color: #00AA3E;
+    font-weight: bold;
+}
+.standings-wa {
+    color: #FF0000;
+}

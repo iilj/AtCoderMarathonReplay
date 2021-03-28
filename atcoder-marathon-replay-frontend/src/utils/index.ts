@@ -18,6 +18,20 @@ export const dateToString = (
     .replace(/ss/g, seconds);
 };
 
+export const formatScore = (score: number): string =>
+  String(score).replace(/(\d)(?=(\d\d\d)+(?!\d))/g, '$1,');
+
+export const formatElapsedSec = (elapsedSec: number): string => {
+  const days = Math.floor(elapsedSec / (3600 * 24));
+  const hours = Math.floor((elapsedSec / 3600) % 24);
+  const minutes = Math.floor((elapsedSec / 60) % 60);
+  const seconds = Math.floor(elapsedSec % 60);
+  const pad = (num: number): string => `0${num}`.slice(-2);
+  return `${days > 0 ? `${days}d ` : ''}${hours}:${pad(minutes)}:${pad(
+    seconds
+  )}`;
+};
+
 /**
  * returns suffix string of order, e.g. "st" of "1st".
  *

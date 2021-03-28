@@ -15,8 +15,14 @@ AtCoder で行われたマラソンコンテストにおける順位および得
 
 ### 補足
 
-- AHC001 は最終提出のプレテスト得点不明につき，各ユーザの最終提出のスコアは，システス結果 * 50 / 1000 を用いています．
-- 日立北大2020 は最終提出のプレテスト得点不明につき，各ユーザの最終提出のスコアは，システス結果 * 16 / 200 を用いています．
+以下のコンテストの問題に対する各ユーザの最終提出は，プレテスト得点が不明であるため，システムテストの得点に下記の倍率を掛けた値を用いています．
+- ~~ahc001: 50 / 1000~~ → [result\_ahc001\.csv](https://www.dropbox.com/s/rqrlprp0zoyi4di/result_ahc001.csv?dl=0) から Provisional Score を取り込みました．
+- hokudai-hitachi2020: 16 / 200
+- hokudai-hitachi2019-2: 30 / 100
+- hokudai-hitachi2019-1: 30 / 100
+- hokudai-hitachi2018: 15 / 100
+- hokudai-hitachi2017-2: 30 / 150
+- hokudai-hitachi2017-1: 30 / 150
 
 ## atcoder-marathon-replay-frontend
 
