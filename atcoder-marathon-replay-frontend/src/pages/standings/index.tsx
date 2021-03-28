@@ -16,12 +16,28 @@ interface Props {
   match: {
     params: {
       contest: string;
+      datetime: string;
     };
   };
 }
 
+const datetimeRegExp = /^(\d\d\d\d)(\d\d)(\d\d)-(\d\d)(\d\d)(\d\d)$/;
+const parseParamDatetime = (paramDatetime: string): Date | undefined => {
+  const datetimeRegExpMatch = datetimeRegExp.exec(paramDatetime);
+  if (datetimeRegExpMatch === null) return undefined;
+  const year = Number(datetimeRegExpMatch[1]);
+  const month = Number(datetimeRegExpMatch[2]);
+  const date = Number(datetimeRegExpMatch[3]);
+  const hours = Number(datetimeRegExpMatch[4]);
+  const minutes = Number(datetimeRegExpMatch[5]);
+  const seconds = Number(datetimeRegExpMatch[6]);
+  return new Date(year, month - 1, date, hours, minutes, seconds);
+};
+
 export const StandingsPage: React.FC<Props> = (props) => {
   const paramContest: string = props.match.params.contest ?? '';
+  const paramDatetime: string = props.match.params.datetime ?? '';
+  const parsedDatetime = parseParamDatetime(paramDatetime);
 
   const { data: contests, error: contestsError } = useSWR<Contest[], Error>(
     '/contests/contests',
@@ -79,7 +95,12 @@ export const StandingsPage: React.FC<Props> = (props) => {
           Fetch contest data...
         </div>
       ) : (
-        <FormBlock paramContest={paramContest} contests={contests} />
+        <FormBlock
+          paramContest={paramContest}
+          contests={contests}
+          contestMap={contestMap}
+          parsedDatetime={parsedDatetime}
+        />
       )}
 
       {contestSubmissionsError ? (
@@ -117,11 +138,22 @@ export const StandingsPage: React.FC<Props> = (props) => {
         </div>
       ) : contestSubmissions === undefined || contestTasks === undefined ? (
         <div style={{ height: '50px' }}></div>
+      ) : parsedDatetime === undefined ? (
+        <Alert
+          color="danger"
+          style={{
+            marginTop: '50px',
+            marginBottom: '50px',
+          }}
+        >
+          Invalid datetime format.
+        </Alert>
       ) : (
         <StandingsTable
           contest={contestMap?.get(paramContest)}
           contestSubmissions={contestSubmissions}
           contestTasks={contestTasks}
+          parsedDatetime={parsedDatetime}
         />
       )}
 

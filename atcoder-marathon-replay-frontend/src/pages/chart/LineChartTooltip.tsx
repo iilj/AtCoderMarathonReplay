@@ -1,5 +1,5 @@
 import React from 'react';
-import { dateToString } from '../../utils';
+import dataFormat from 'dateformat';
 import { RankChartData } from '../../utils/RankReproducer';
 
 interface RankLineChartTooltipPayloadContainer {
@@ -34,7 +34,7 @@ export const LineChartTooltip: React.FC<Props> = (props) => {
       }}
     >
       <p className="recharts-tooltip-label" style={{ margin: '0px' }}>
-        {dateToString(new Date(label * 1000))}
+        {dataFormat(new Date(label * 1000), 'yyyy-mm-dd HH:MM:ss')}
       </p>
       {payload
         .map((payloadContainer: RankLineChartTooltipPayloadContainer) => {

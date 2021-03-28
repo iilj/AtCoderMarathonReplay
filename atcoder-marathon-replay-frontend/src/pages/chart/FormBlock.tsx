@@ -1,8 +1,8 @@
 import React, { useState, useMemo, useEffect } from 'react';
 import { NavLink, useHistory } from 'react-router-dom';
 import { Button, Input, Row, FormGroup, Label, Col } from 'reactstrap';
+import dataFormat from 'dateformat';
 import Contest from '../../interfaces/Contest';
-import { dateToString } from '../../utils';
 
 interface Props {
   paramUsers: string;
@@ -13,7 +13,7 @@ interface Props {
 const generatePath = (contest: string, user: string): string =>
   `/chart/${contest}/${user}`;
 const getContestDropdownLabel = (contest: Contest): string =>
-  `${dateToString(new Date(contest.start_time_unix * 1000), 'YYYY-MM-DD')} ${
+  `${dataFormat(new Date(contest.start_time_unix * 1000), 'yyyy-mm-dd')} ${
     contest.contest_name
   }`;
 

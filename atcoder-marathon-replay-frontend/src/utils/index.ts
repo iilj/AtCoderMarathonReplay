@@ -1,22 +1,22 @@
-export const dateToString = (
-  _date: Date,
-  format = 'YYYY-MM-DD hh:mm:ss'
-): string => {
-  const year = _date.getFullYear().toString();
-  const month = `0${1 + _date.getMonth()}`.slice(-2);
-  const date = `0${_date.getDate()}`.slice(-2);
-  const hours = `0${_date.getHours()}`.slice(-2);
-  const minutes = `0${_date.getMinutes()}`.slice(-2);
-  const seconds = `0${_date.getSeconds()}`.slice(-2);
+// export const dateToString = (
+//   _date: Date,
+//   format = 'YYYY-MM-DD hh:mm:ss'
+// ): string => {
+//   const year = _date.getFullYear().toString();
+//   const month = `0${1 + _date.getMonth()}`.slice(-2);
+//   const date = `0${_date.getDate()}`.slice(-2);
+//   const hours = `0${_date.getHours()}`.slice(-2);
+//   const minutes = `0${_date.getMinutes()}`.slice(-2);
+//   const seconds = `0${_date.getSeconds()}`.slice(-2);
 
-  return format
-    .replace(/YYYY/g, year)
-    .replace(/MM/g, month)
-    .replace(/DD/g, date)
-    .replace(/hh/g, hours)
-    .replace(/mm/g, minutes)
-    .replace(/ss/g, seconds);
-};
+//   return format
+//     .replace(/YYYY/g, year)
+//     .replace(/MM/g, month)
+//     .replace(/DD/g, date)
+//     .replace(/hh/g, hours)
+//     .replace(/mm/g, minutes)
+//     .replace(/ss/g, seconds);
+// };
 
 export const formatScore = (score: number): string =>
   String(score).replace(/(\d)(?=(\d\d\d)+(?!\d))/g, '$1,');

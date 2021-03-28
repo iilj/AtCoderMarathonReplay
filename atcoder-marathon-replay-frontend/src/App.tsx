@@ -33,6 +33,11 @@ const App: React.FC = () => {
               />
               <Route
                 exact
+                path="/standings/:contest/:datetime"
+                component={StandingsPage as React.FC}
+              />
+              <Route
+                exact
                 path="/standings/:contest/"
                 component={StandingsPage as React.FC}
               />

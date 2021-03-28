@@ -11,6 +11,7 @@ import {
   faSortDown,
   faSortUp,
 } from '@fortawesome/free-solid-svg-icons';
+import dataFormat from 'dateformat';
 import Contest from '../../interfaces/Contest';
 import Submission from '../../interfaces/Submission';
 import './standings-table.css';
@@ -76,10 +77,11 @@ interface Props {
   contest?: Contest;
   contestSubmissions: Submission[];
   contestTasks: Task[];
+  parsedDatetime: Date;
 }
 
 export const StandingsTable: React.FC<Props> = (props) => {
-  const { contest, contestSubmissions, contestTasks } = props;
+  const { contest, contestSubmissions, contestTasks, parsedDatetime } = props;
 
   if (contest === undefined) {
     return <div style={{ height: '50px' }}></div>;
@@ -103,6 +105,10 @@ export const StandingsTable: React.FC<Props> = (props) => {
   // generate standings
   const userStandingsEntriesMap = new Map<string, UserStandingsEntry>();
   contestSubmissions.forEach((contestSubmission: Submission): void => {
+    // filter by datetime
+    const curDatetime = new Date(contestSubmission.time_unix * 1000);
+    if (curDatetime > parsedDatetime) return;
+
     // initialize/get entry
     let userStandingsEntry: UserStandingsEntry;
     if (userStandingsEntriesMap.has(contestSubmission.user_name)) {
@@ -209,7 +215,6 @@ export const StandingsTable: React.FC<Props> = (props) => {
         );
       },
       sortFunc: function _sortFunc(a: string, b: string, order: SortOrder) {
-        // console.log(order, a > b);
         if (order === 'desc') {
           return a > b ? 1 : -1;
         } else {
@@ -365,20 +370,32 @@ export const StandingsTable: React.FC<Props> = (props) => {
   ];
 
   return (
-    <BootstrapTable
-      bootstrap4
-      classes="th-center th-middle td-center td-middle table-standings"
-      rowStyle={{ fontSize: '14px' }}
-      striped
-      keyField="user_name"
-      data={userStandingsEntries}
-      columns={columns}
-      pagination={paginationFactory({
-        sizePerPage: 20,
-        sizePerPageList: [10, 20, 50, 100, 1000],
-      })}
-      filter={filterFactory()}
-      wrapperClasses="table-responsive"
-    />
+    <>
+      <h4
+        style={{
+          textAlign: 'center',
+          marginTop: '30px',
+          marginBottom: '-30px',
+        }}
+      >
+        Replay of {contest.contest_name} at{' '}
+        {dataFormat(parsedDatetime, 'yyyy-mm-dd HH:MM:ss')}
+      </h4>
+      <BootstrapTable
+        bootstrap4
+        classes="th-center th-middle td-center td-middle table-standings"
+        rowStyle={{ fontSize: '14px' }}
+        striped
+        keyField="user_name"
+        data={userStandingsEntries}
+        columns={columns}
+        pagination={paginationFactory({
+          sizePerPage: 20,
+          sizePerPageList: [10, 20, 50, 100, 1000],
+        })}
+        filter={filterFactory()}
+        wrapperClasses="table-responsive"
+      />
+    </>
   );
 };

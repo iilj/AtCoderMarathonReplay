@@ -11,9 +11,9 @@ import {
   UncontrolledTooltip,
   Alert,
 } from 'reactstrap';
+import dataFormat from 'dateformat';
 import Contest from '../../interfaces/Contest';
 import Submission from '../../interfaces/Submission';
-import { dateToString } from '../../utils';
 import { getRankSequence, RankChartData } from '../../utils/RankReproducer';
 import { RankLineChart } from './RankLineChart';
 import { ScoreLineChart } from './ScoreLineChart';
@@ -114,9 +114,9 @@ export const ChartBlock: React.FC<Props> = (props) => {
       },
       [-1, contestSubmissions.length] as [number, number]
     );
-    maxRankText = `\n最大瞬間風速は ${maxrank} 位 (${dateToString(
+    maxRankText = `\n最大瞬間風速は ${maxrank} 位 (${dataFormat(
       new Date(maxtime * 1000),
-      'MM/DD hh:mm'
+      'mm/dd HH:MM'
     )}) だよ！`;
   }
   const tweetTitle = `${users.join(',')}'s replay of ${contest.contest_name}
