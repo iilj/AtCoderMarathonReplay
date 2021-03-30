@@ -216,14 +216,11 @@ export const ChartBlock: React.FC<Props> = (props) => {
         <TwitterShareButton
           url={window.location.href}
           title={tweetTitle}
-          id="UncontrolledTooltipExample"
+          id="chart-share-button"
         >
           <TwitterIcon size={40} round />
         </TwitterShareButton>
-        <UncontrolledTooltip
-          placement="top"
-          target="UncontrolledTooltipExample"
-        >
+        <UncontrolledTooltip placement="top" target="chart-share-button">
           {(tweetTitle + ' ' + window.location.href).replaceAll('\n', ' ')}
         </UncontrolledTooltip>
       </div>

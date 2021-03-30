@@ -10,6 +10,7 @@ import {
   faSort,
   faSortDown,
   faSortUp,
+  faSearch,
 } from '@fortawesome/free-solid-svg-icons';
 import dataFormat from 'dateformat';
 import Contest from '../../interfaces/Contest';
@@ -207,7 +208,13 @@ export const StandingsTable: React.FC<Props> = (props) => {
       classes: 'standings-username',
       headerClasses: 'standings-username-head',
       filter: textFilter(),
-      formatter: function _formatter(cell: string) {
+      formatter: function _formatter(
+        cell: string,
+        _row: UserStandingsEntry,
+        _rowIndex: number,
+        _contest: Contest
+      ) {
+        const btnId = `standings-user-btn-submission-${cell}`;
         return (
           <>
             <a
@@ -218,9 +225,21 @@ export const StandingsTable: React.FC<Props> = (props) => {
             >
               <span className="user">{cell}</span>
             </a>
+            <span className="standings-user-btn">
+              <a
+                href={`https://atcoder.jp/contests/${_contest.contest_slug}/submissions?f.User=${cell}`}
+                id={btnId}
+              >
+                <FontAwesomeIcon icon={faSearch} />
+              </a>
+              <UncontrolledTooltip placement="top" target={btnId}>
+                {`view ${cell}'s submissions`}
+              </UncontrolledTooltip>
+            </span>
           </>
         );
       },
+      formatExtraData: contest,
       sortFunc: function _sortFunc(a: string, b: string, order: SortOrder) {
         if (order === 'desc') {
           return a > b ? 1 : -1;
@@ -424,13 +443,13 @@ export const StandingsTable: React.FC<Props> = (props) => {
         <TwitterShareButton
           url={window.location.href}
           title={tweetTitle}
-          id="UncontrolledTooltipExample"
+          id="standings-table-share-button"
         >
           <TwitterIcon size={40} round />
         </TwitterShareButton>
         <UncontrolledTooltip
           placement="top"
-          target="UncontrolledTooltipExample"
+          target="standings-table-share-button"
         >
           {(tweetTitle + ' ' + window.location.href).replaceAll('\n', ' ')}
         </UncontrolledTooltip>

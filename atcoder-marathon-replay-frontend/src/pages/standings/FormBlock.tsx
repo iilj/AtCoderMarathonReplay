@@ -5,6 +5,7 @@ import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
 import dataFormat from 'dateformat';
 import Contest from '../../interfaces/Contest';
+import { formatElapsedSec } from '../../utils';
 
 interface Props {
   paramContest: string;
@@ -105,12 +106,14 @@ export const FormBlock: React.FC<Props> = (props) => {
                   margin: '0.2rem',
                   marginLeft: '1rem',
                 }}
-              >{`(${dataFormat(
+              >{`Duration: ${dataFormat(
                 new Date(_contest.start_time_unix * 1000),
-                'yyyy-mm-dd HH:MM:ss'
+                'yyyy-mm-dd(ddd) HH:MMo'
               )} ~ ${dataFormat(
                 new Date(_contest.end_time_unix * 1000),
-                'yyyy-mm-dd HH:MM:ss'
+                'yyyy-mm-dd(ddd) HH:MMo'
+              )} (${formatElapsedSec(
+                _contest.end_time_unix - _contest.start_time_unix
               )})`}</div>
             )}
           </FormGroup>
@@ -150,6 +153,20 @@ export const FormBlock: React.FC<Props> = (props) => {
                 );
               }}
             />
+            {_contest && (
+              <div
+                className="contest-duration"
+                style={{
+                  color: '#666',
+                  fontSize: 'small',
+                  margin: '0.2rem',
+                  marginLeft: '1rem',
+                }}
+              >{`Elapsed: ${formatElapsedSec(
+                Math.floor(cursorDate.getTime() / 1000) -
+                  _contest.start_time_unix
+              )}`}</div>
+            )}
           </FormGroup>
         </Col>
       </Row>

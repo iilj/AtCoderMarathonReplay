@@ -30,6 +30,10 @@
 .standings-username-head {
     min-width: 140px;
 }
+.standings-username-head label.filter-label, .standings-username-head label.filter-label .form-control {
+    font-size: 14px;
+    margin-bottom: 0;
+}
 .standings-result-head {
     min-width: 140px;
 }
@@ -37,6 +41,16 @@
 /* セル個別設定 */
 .username > span {
     font-weight: bold;
+}
+.standings-user-btn {
+    margin-left: 0.2rem;
+    visibility: hidden;
+}
+.standings-user-btn a {
+    color: black;
+}
+td:hover .standings-user-btn {
+    visibility: visible;
 }
 .standings-result {
     padding: 0 !important;
