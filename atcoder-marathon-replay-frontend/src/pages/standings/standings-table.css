@@ -1,7 +1,7 @@
 /* テーブル全体設定 */
 .table-standings {
     font-size: 14px;
-    margin-top: 30px;
+    /* margin-top: 30px; */
 }
 .table-standings.table-striped tbody tr:nth-of-type(odd) {
     background-color: #f9f9f9;
@@ -10,6 +10,9 @@
     table-layout: auto;
   }
 /* セル全体設定 */
+.table-standings td, .table-standings th {
+    padding: 8px;
+}
 .th-center thead th {
     text-align: center;
 }

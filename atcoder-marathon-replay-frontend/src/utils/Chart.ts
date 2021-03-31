@@ -16,12 +16,12 @@ export const getDatetimeTicks = (contest: Contest): number[] => {
   } else {
     interval_sec = 3600 * 24; // 1 日ごと
   }
-  const offsetHours: number = new Date(0).getHours(); // 9 in Asia/Tokyo (JST)
+  const offsetMinutes: number = new Date(0).getTimezoneOffset(); // -9*60 in Asia/Tokyo (JST)
   const ret: number[] = [contest.start_time_unix];
   for (
     let cur =
       contest.start_time_unix -
-      ((contest.start_time_unix + 3600 * offsetHours) % interval_sec) +
+      ((contest.start_time_unix - 60 * offsetMinutes) % interval_sec) +
       interval_sec;
     cur < contest.end_time_unix;
     cur += interval_sec

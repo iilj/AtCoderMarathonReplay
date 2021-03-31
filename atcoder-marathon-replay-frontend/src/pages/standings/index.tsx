@@ -1,15 +1,15 @@
 import React from 'react';
 import useSWR from 'swr';
 import { Alert } from 'reactstrap';
-import Contest from '../../interfaces/Contest';
-import Submission from '../../interfaces/Submission';
+import { FormBlock } from './FormBlock';
+import { StandingsTable } from './StandingsTable';
 import {
   fetchContests,
   fetchContestSubmissions,
   fetchContestTasks,
 } from '../../utils/Data';
-import { FormBlock } from './FormBlock';
-import { StandingsTable } from './StandingsTable';
+import Contest from '../../interfaces/Contest';
+import Submission from '../../interfaces/Submission';
 import Task from '../../interfaces/Task';
 
 interface Props {
@@ -21,17 +21,11 @@ interface Props {
   };
 }
 
-const datetimeRegExp = /^(\d\d\d\d)(\d\d)(\d\d)-(\d\d)(\d\d)(\d\d)$/;
+const datetimeRegExp = /^(\d\d\d\d)-(\d\d)-(\d\d)T(\d\d):(\d\d):(\d\d)[+-](\d\d)(\d\d)$/;
 const parseParamDatetime = (paramDatetime: string): Date | undefined => {
   const datetimeRegExpMatch = datetimeRegExp.exec(paramDatetime);
   if (datetimeRegExpMatch === null) return undefined;
-  const year = Number(datetimeRegExpMatch[1]);
-  const month = Number(datetimeRegExpMatch[2]);
-  const date = Number(datetimeRegExpMatch[3]);
-  const hours = Number(datetimeRegExpMatch[4]);
-  const minutes = Number(datetimeRegExpMatch[5]);
-  const seconds = Number(datetimeRegExpMatch[6]);
-  return new Date(year, month - 1, date, hours, minutes, seconds);
+  return new Date(paramDatetime);
 };
 
 export const StandingsPage: React.FC<Props> = (props) => {
@@ -156,26 +150,6 @@ export const StandingsPage: React.FC<Props> = (props) => {
           parsedDatetime={parsedDatetime}
         />
       )}
-
-      <h2>補足</h2>
-      <p>
-        以下のコンテストの問題に対する各ユーザの最終提出は，プレテスト得点が不明であるため，システムテストの得点に下記の倍率を掛けた値を用いています．
-      </p>
-      <ul>
-        <li>
-          <del>ahc001: 50 / 1000</del> →{' '}
-          <a href="https://www.dropbox.com/s/rqrlprp0zoyi4di/result_ahc001.csv?dl=0">
-            result_ahc001.csv
-          </a>{' '}
-          から Provisional Score を取り込みました．
-        </li>
-        <li>hokudai-hitachi2020: 16 / 200</li>
-        <li>hokudai-hitachi2019-2: 30 / 100</li>
-        <li>hokudai-hitachi2019-1: 30 / 100</li>
-        <li>hokudai-hitachi2018: 15 / 100</li>
-        <li>hokudai-hitachi2017-2: 30 / 150</li>
-        <li>hokudai-hitachi2017-1: 30 / 150</li>
-      </ul>
     </>
   );
 };

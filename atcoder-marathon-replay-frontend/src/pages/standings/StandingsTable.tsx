@@ -1,9 +1,12 @@
 import React from 'react';
+import { UncontrolledTooltip } from 'reactstrap';
 import BootstrapTable, {
   ColumnDescription,
   SortOrder,
 } from 'react-bootstrap-table-next';
-import paginationFactory from 'react-bootstrap-table2-paginator';
+import paginationFactory, {
+  PaginationProvider,
+} from 'react-bootstrap-table2-paginator';
 import filterFactory, { textFilter } from 'react-bootstrap-table2-filter';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {
@@ -12,14 +15,14 @@ import {
   faSortUp,
   faSearch,
 } from '@fortawesome/free-solid-svg-icons';
+import { TwitterIcon, TwitterShareButton } from 'react-share';
 import dataFormat from 'dateformat';
+import { PaginationPanel } from '../../components/PaginationPanel';
+import { formatScore, formatElapsedSec } from '../../utils';
 import Contest from '../../interfaces/Contest';
 import Submission from '../../interfaces/Submission';
-import './standings-table.css';
-import { formatScore, formatElapsedSec } from '../../utils';
 import Task from '../../interfaces/Task';
-import { TwitterIcon, TwitterShareButton } from 'react-share';
-import { UncontrolledTooltip } from 'reactstrap';
+import './standings-table.css';
 
 interface UserStandingsTaskEntry {
   score: number;
@@ -407,38 +410,64 @@ export const StandingsTable: React.FC<Props> = (props) => {
   const tweetTitle =
     `Replay of ${contest.contest_name} at ${dataFormat(
       parsedDatetime,
-      'yyyy-mm-dd HH:MM:ss'
+      'yyyy-mm-dd HH:MM:sso'
     )}\n` +
     `${maxRankText}\n` +
     `AtCoder Marathon Replay`;
 
   return (
     <>
+      <hr />
       <h4
         style={{
           textAlign: 'center',
           marginTop: '30px',
-          marginBottom: '-30px',
         }}
       >
-        Replay of {contest.contest_name} at{' '}
-        {dataFormat(parsedDatetime, 'yyyy-mm-dd HH:MM:ss')}
+        Replay of {contest.contest_name}
       </h4>
-      <BootstrapTable
-        bootstrap4
-        classes="th-center th-middle td-center td-middle table-standings"
-        rowStyle={{ fontSize: '14px' }}
-        striped
-        keyField="user_name"
-        data={userStandingsEntries}
-        columns={columns}
+      <h5
+        style={{
+          textAlign: 'center',
+        }}
+      >
+        at {dataFormat(parsedDatetime, 'yyyy-mm-dd(ddd) HH:MM:sso')} (
+        {formatElapsedSec(
+          Math.floor(parsedDatetime.getTime() / 1000) - contest.start_time_unix
+        )}{' '}
+        elapsed)
+      </h5>
+      <PaginationProvider
         pagination={paginationFactory({
+          custom: true,
           sizePerPage: 20,
           sizePerPageList: [10, 20, 50, 100, 1000],
+          totalSize: userStandingsEntries.length,
         })}
-        filter={filterFactory()}
-        wrapperClasses="table-responsive"
-      />
+      >
+        {({ paginationProps, paginationTableProps }) => {
+          paginationTableProps.keyField = 'user_name';
+          paginationTableProps.data = userStandingsEntries;
+          paginationTableProps.columns = columns;
+          return (
+            <div>
+              <PaginationPanel renderSizePerPage={true} {...paginationProps} />
+              <BootstrapTable
+                bootstrap4
+                classes="th-center th-middle td-center td-middle table-standings"
+                striped
+                // keyField="user_name"
+                // data={userStandingsEntries}
+                // columns={columns}
+                filter={filterFactory()}
+                wrapperClasses="table-responsive"
+                {...paginationTableProps}
+              />
+              <PaginationPanel renderSizePerPage={false} {...paginationProps} />
+            </div>
+          );
+        }}
+      </PaginationProvider>
       <div style={{ textAlign: 'center' }}>
         <TwitterShareButton
           url={window.location.href}
@@ -454,6 +483,7 @@ export const StandingsTable: React.FC<Props> = (props) => {
           {(tweetTitle + ' ' + window.location.href).replaceAll('\n', ' ')}
         </UncontrolledTooltip>
       </div>
+      <hr />
     </>
   );
 };

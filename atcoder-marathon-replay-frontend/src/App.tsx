@@ -8,6 +8,7 @@ import {
 import { Container } from 'reactstrap';
 import { SWRConfig } from 'swr';
 import { NavigationBar } from './components/NavigationBar';
+import { Supplement } from './components/Supplement';
 import { ChartPage } from './pages/chart';
 import { StandingsPage } from './pages/standings';
 
@@ -49,6 +50,7 @@ const App: React.FC = () => {
               />
               <Redirect path="/" to="/chart/" />
             </Switch>
+            <Supplement />
           </Container>
           <footer
             className="footer"

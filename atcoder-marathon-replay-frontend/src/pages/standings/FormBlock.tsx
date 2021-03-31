@@ -15,7 +15,7 @@ interface Props {
 }
 
 const generatePath = (contest: string, cursorDate: Date): string =>
-  `/standings/${contest}/${dataFormat(cursorDate, 'yyyymmdd-HHMMss')}`;
+  `/standings/${contest}/${dataFormat(cursorDate, "yyyy-mm-dd'T'HH:MM:sso")}`;
 const getContestDropdownLabel = (contest: Contest): string =>
   `${dataFormat(new Date(contest.start_time_unix * 1000), 'yyyy-mm-dd')} ${
     contest.contest_name
