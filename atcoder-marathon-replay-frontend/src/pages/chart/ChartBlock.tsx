@@ -11,9 +11,9 @@ import {
   UncontrolledTooltip,
   Alert,
 } from 'reactstrap';
+import dataFormat from 'dateformat';
 import Contest from '../../interfaces/Contest';
 import Submission from '../../interfaces/Submission';
-import { dateToString } from '../../utils';
 import { getRankSequence, RankChartData } from '../../utils/RankReproducer';
 import { RankLineChart } from './RankLineChart';
 import { ScoreLineChart } from './ScoreLineChart';
@@ -114,14 +114,15 @@ export const ChartBlock: React.FC<Props> = (props) => {
       },
       [-1, contestSubmissions.length] as [number, number]
     );
-    maxRankText = `\n最大瞬間風速は ${maxrank} 位 (${dateToString(
+    maxRankText = `\n最大瞬間風速は ${maxrank} 位 (${dataFormat(
       new Date(maxtime * 1000),
-      'MM/DD hh:mm'
+      'mm/dd HH:MM'
     )}) だよ！`;
   }
-  const tweetTitle = `${users.join(',')}'s replay of ${contest.contest_name}
-  ${maxRankText}
-  AtCoder Marathon Replay`;
+  const tweetTitle =
+    `${users.join(',')}'s replay of ${contest.contest_name}\n` +
+    `${maxRankText}\n` +
+    `AtCoder Marathon Replay`;
 
   return (
     <>
@@ -215,14 +216,11 @@ export const ChartBlock: React.FC<Props> = (props) => {
         <TwitterShareButton
           url={window.location.href}
           title={tweetTitle}
-          id="UncontrolledTooltipExample"
+          id="chart-share-button"
         >
           <TwitterIcon size={40} round />
         </TwitterShareButton>
-        <UncontrolledTooltip
-          placement="top"
-          target="UncontrolledTooltipExample"
-        >
+        <UncontrolledTooltip placement="top" target="chart-share-button">
           {(tweetTitle + ' ' + window.location.href).replaceAll('\n', ' ')}
         </UncontrolledTooltip>
       </div>

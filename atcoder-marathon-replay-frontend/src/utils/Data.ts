@@ -1,4 +1,5 @@
 import Contest from '../interfaces/Contest';
+import Task from '../interfaces/Task';
 import Submission from '../interfaces/Submission';
 
 const CONTEST_SUBMISSION_MAP: Map<string, Submission[]> = new Map<
@@ -20,6 +21,22 @@ export const fetchContestSubmissions = async (
             return submissions;
           })
       : Promise.resolve(CONTEST_SUBMISSION_MAP.get(contest) as Submission[])
+    : Promise.resolve([]);
+
+const CONTEST_TASK_MAP: Map<string, Task[]> = new Map<string, Task[]>();
+export const fetchContestTasks = async (contest?: string): Promise<Task[]> =>
+  contest !== undefined && contest.length > 0
+    ? !CONTEST_TASK_MAP.has(contest)
+      ? fetch(`${process.env.PUBLIC_URL}/tasks/${contest}.json`)
+          .catch((e) => {
+            throw Error(e);
+          })
+          .then(async (r) => {
+            const tasks = (await r.json()) as Task[];
+            CONTEST_TASK_MAP.set(contest, tasks);
+            return tasks;
+          })
+      : Promise.resolve(CONTEST_TASK_MAP.get(contest) as Task[])
     : Promise.resolve([]);
 
 let CONTESTS: Contest[] | undefined = undefined;

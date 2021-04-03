@@ -87,6 +87,23 @@ def export_submissions(cur: Cursor, contest: str = 'ahc001') -> None:
         json.dump(data, f, separators=(',', ':'))
 
 
+def export_tasks(cur: Cursor, contest_slug: str = 'ahc001') -> None:
+    data: List[Dict[str, Union[str, int, float]]] = []
+    for row in cur.execute('SELECT contest_slug, task_slug, label, name, time_limit_sec, memory_limit_mb '
+                           'FROM tasks WHERE contest_slug = ? '
+                           'ORDER BY label ASC', (contest_slug,)):
+        data.append({
+            'contest_slug': row[0],
+            'task_slug': row[1],
+            'label': row[2],
+            'name': row[3],
+            'time_limit_sec': row[4],
+            'memory_limit_mb': row[5]
+        })
+    with open(f'../atcoder-marathon-replay-frontend/public/tasks/{contest_slug}.json', mode='wt', encoding='utf-8') as f:
+        json.dump(data, f, separators=(',', ':'))
+
+
 def export_contests(cur: Cursor) -> List[Dict[str, Union[str, int]]]:
     data: List[Dict[str, Union[str, int]]] = []
     for row in cur.execute('SELECT contest_slug, contest_name, start_time_unix, end_time_unix FROM contests '
@@ -115,7 +132,8 @@ def main() -> None:
     for contest in contests:
         assert isinstance(contest['contest_slug'], str)
         contest_slug: str = contest['contest_slug']
-        print(f'export submissions of {contest_slug} ({contest["contest_name"]})')
+        print(f'export tasks and submissions of {contest_slug} ({contest["contest_name"]})')
+        export_tasks(cur, contest_slug)
         export_submissions(cur, contest_slug)
 
     conn.close()

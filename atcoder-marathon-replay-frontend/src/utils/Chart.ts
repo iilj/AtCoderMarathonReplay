@@ -1,4 +1,4 @@
-import { dateToString } from '.';
+import dataFormat from 'dateformat';
 import Contest from '../interfaces/Contest';
 
 export const getDatetimeTicks = (contest: Contest): number[] => {
@@ -16,11 +16,12 @@ export const getDatetimeTicks = (contest: Contest): number[] => {
   } else {
     interval_sec = 3600 * 24; // 1 日ごと
   }
+  const offsetMinutes: number = new Date(0).getTimezoneOffset(); // -9*60 in Asia/Tokyo (JST)
   const ret: number[] = [contest.start_time_unix];
   for (
     let cur =
       contest.start_time_unix -
-      ((contest.start_time_unix + 3600 * 9) % interval_sec) +
+      ((contest.start_time_unix - 60 * offsetMinutes) % interval_sec) +
       interval_sec;
     cur < contest.end_time_unix;
     cur += interval_sec
@@ -38,16 +39,15 @@ export const getDatetimeTickFormatter = (
     (contest.end_time_unix - contest.start_time_unix) / 3600;
   let format = '';
   if (contestDurationHours <= 12) {
-    format = 'hh:mm'; // 12 時間以内なら 1 時間ごとに
+    format = 'HH:MM'; // 12 時間以内なら 1 時間ごとに
   } else if (contestDurationHours <= 24) {
-    format = 'hh:mm'; // 24 時間以内なら 2 時間ごとに
+    format = 'HH:MM'; // 24 時間以内なら 2 時間ごとに
   } else if (contestDurationHours <= 24 * 3) {
-    format = 'MM/DD hh:mm'; // 3 日以内なら 6 時間ごとに
+    format = 'mm/dd HH:MM'; // 3 日以内なら 6 時間ごとに
   } else {
-    format = 'MM/DD'; // 1 日ごと
+    format = 'mm/dd'; // 1 日ごと
   }
-  return (time_unix: number) =>
-    dateToString(new Date(time_unix * 1000), format);
+  return (time_unix: number) => dataFormat(new Date(time_unix * 1000), format);
 };
 
 export const scoreTickFormatter = (score: number): string => {

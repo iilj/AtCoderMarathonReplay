@@ -4,22 +4,20 @@ import {
   Switch,
   Route,
   Redirect,
-  Link,
 } from 'react-router-dom';
-import { Container, Navbar, NavbarBrand } from 'reactstrap';
+import { Container } from 'reactstrap';
 import { SWRConfig } from 'swr';
+import { NavigationBar } from './components/NavigationBar';
+import { Supplement } from './components/Supplement';
 import { ChartPage } from './pages/chart';
+import { StandingsPage } from './pages/standings';
 
 const App: React.FC = () => {
   return (
     <div className="App">
       <SWRConfig value={{ revalidateOnFocus: false }}>
         <Router>
-          <Navbar color="light" light expand="lg" fixed="top">
-            <NavbarBrand tag={Link} to={'/'}>
-              AtCoder Marathon Replay
-            </NavbarBrand>
-          </Navbar>
+          <NavigationBar />
           <Container
             style={{ width: '100%', maxWidth: '90%', marginTop: '80px' }}
           >
@@ -34,9 +32,25 @@ const App: React.FC = () => {
                 path="/chart/:contest/"
                 component={ChartPage as React.FC}
               />
+              <Route
+                exact
+                path="/standings/:contest/:datetime"
+                component={StandingsPage as React.FC}
+              />
+              <Route
+                exact
+                path="/standings/:contest/"
+                component={StandingsPage as React.FC}
+              />
               <Route exact path="/chart/" component={ChartPage as React.FC} />
+              <Route
+                exact
+                path="/standings/"
+                component={StandingsPage as React.FC}
+              />
               <Redirect path="/" to="/chart/" />
             </Switch>
+            <Supplement />
           </Container>
           <footer
             className="footer"
@@ -48,9 +62,21 @@ const App: React.FC = () => {
           >
             <div className="container">
               連絡先:{' '}
-              <a href="https://twitter.com/iiljj">si (@iiljj) / Twitter</a>
+              <a
+                href="https://twitter.com/iiljj"
+                target="_blank"
+                rel="noreferrer noopener"
+              >
+                si (@iiljj) / Twitter
+              </a>
               {', '}
-              <a href="https://github.com/iilj">iilj (iilj) / GitHub</a>
+              <a
+                href="https://github.com/iilj"
+                target="_blank"
+                rel="noreferrer noopener"
+              >
+                iilj (iilj) / GitHub
+              </a>
             </div>
           </footer>
         </Router>

@@ -24,3 +24,13 @@ CREATE TABLE contests(
     crawl_completed INTEGER DEFAULT 0,
     closed INTEGER DEFAULT 0
 );
+
+CREATE TABLE tasks(
+    contest_slug TEXT,
+    task_slug TEXT,
+    label TEXT,
+    name TEXT,
+    time_limit_sec REAL,
+    memory_limit_mb INTEGER,
+    PRIMARY KEY(contest_slug, task_slug)
+);
