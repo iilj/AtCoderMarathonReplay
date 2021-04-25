@@ -3,9 +3,14 @@ import useSWR from 'swr';
 import { Alert } from 'reactstrap';
 import { FormBlock } from './FormBlock';
 import { ChartBlock } from './ChartBlock';
-import { fetchContests, fetchContestSubmissions } from '../../utils/Data';
+import {
+  fetchContests,
+  fetchContestSubmissions,
+  fetchPerfs,
+} from '../../utils/Data';
 import Contest from '../../interfaces/Contest';
 import Submission from '../../interfaces/Submission';
+import Perfs from '../../interfaces/Perfs';
 
 interface Props {
   match: {
@@ -37,6 +42,15 @@ export const ChartPage: React.FC<Props> = (props) => {
     }
   );
 
+  const { data: perfs, error: perfsError } = useSWR<Perfs | undefined, Error>(
+    paramUser.length > 0 && paramContest.length > 0
+      ? `/perfs/${paramContest}`
+      : null,
+    () => {
+      return fetchPerfs(paramContest);
+    }
+  );
+
   const users = paramUser
     .split(',')
     .map((_user) => _user.trim())
@@ -63,6 +77,9 @@ export const ChartPage: React.FC<Props> = (props) => {
           AtCoder Replay (β)
         </a>{' '}
         がマラソンに対応していなかったので作りました．
+      </p>
+      <p>
+        順位表をリプレイする場合は，ページ上部ナビゲーションバーの「Standings」から．
       </p>
 
       <h2>Let&apos;s Replay!</h2>
@@ -125,6 +142,7 @@ export const ChartPage: React.FC<Props> = (props) => {
           users={users}
           contest={contestMap?.get(paramContest)}
           contestSubmissions={contestSubmissions}
+          perfs={perfsError ? undefined : perfs}
         />
       )}
     </>

@@ -64,6 +64,9 @@ export const StandingsPage: React.FC<Props> = (props) => {
         AtCoder
         で行われたマラソンコンテストの，コンテスト中のある時点での順位表を表示します．
       </p>
+      <p>
+        順位推移をリプレイする場合は，ページ上部ナビゲーションバーの「Chart」から．
+      </p>
 
       <h2>Let&apos;s Replay!</h2>
       {contestsError ? (

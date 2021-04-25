@@ -17,6 +17,7 @@ import Submission from '../../interfaces/Submission';
 import { getRankSequence, RankChartData } from '../../utils/RankReproducer';
 import { RankLineChart } from './RankLineChart';
 import { ScoreLineChart } from './ScoreLineChart';
+import Perfs from '../../interfaces/Perfs';
 
 enum ChartTab {
   'rank' = 0,
@@ -27,10 +28,11 @@ interface Props {
   users: string[];
   contest?: Contest;
   contestSubmissions: Submission[];
+  perfs?: Perfs;
 }
 
 export const ChartBlock: React.FC<Props> = (props) => {
-  const { users, contest, contestSubmissions } = props;
+  const { users, contest, contestSubmissions, perfs } = props;
 
   const [showDots, setShowDots] = useState<boolean>(true);
   const [showScoreUpdateLabels, setShowScoreUpdateLabels] = useState<boolean>(
@@ -201,6 +203,7 @@ export const ChartBlock: React.FC<Props> = (props) => {
           contest={contest}
           showDots={showDots}
           showACLabels={showScoreUpdateLabels}
+          perfs={perfs}
         />
       )}
       {activeTab === ChartTab.score && (
