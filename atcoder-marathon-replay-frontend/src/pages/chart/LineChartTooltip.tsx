@@ -22,6 +22,11 @@ interface Props {
   perfs?: Perfs;
 }
 
+const toCorrectedRating = (realRating: number): number => {
+  if (realRating >= 400) return realRating;
+  else return Math.floor(400 / Math.exp((400 - realRating) / 400));
+};
+
 export const LineChartTooltip: React.FC<Props> = (props) => {
   const { active, payload, label, perfs } = props;
   if (!active || payload === undefined || label === undefined) return <></>;
@@ -48,6 +53,9 @@ export const LineChartTooltip: React.FC<Props> = (props) => {
           ) {
             return undefined;
           }
+          const correctedPerf = perfs
+            ? toCorrectedRating(perfs.perfs[curPayload.rank - 1])
+            : 0;
           return (
             <div key={payloadContainer.name}>
               <hr style={{ marginTop: '0.3em', marginBottom: '0.3em' }} />
@@ -90,10 +98,10 @@ export const LineChartTooltip: React.FC<Props> = (props) => {
                     <span className="recharts-tooltip-item-separator"> : </span>
                     <span
                       className={`recharts-tooltip-item-value ${getRatingColorClass(
-                        perfs.perfs[curPayload.rank - 1]
+                        correctedPerf
                       )}`}
                     >
-                      {perfs.perfs[curPayload.rank - 1]}
+                      {correctedPerf}
                     </span>
                     <span className="recharts-tooltip-item-unit" />
                   </li>

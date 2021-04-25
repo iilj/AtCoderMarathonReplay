@@ -74,3 +74,23 @@ export const chartLineColors = [
 ];
 export const getChartLineColor = (index: number): string =>
   chartLineColors[index % chartLineColors.length];
+
+export const getRankTicks = (ma: number): number[] => {
+  const ret: number[] = [0];
+  let d = Math.pow(10, Math.floor(Math.log10(ma) - 0.1));
+  let ma0 = d * Math.ceil(ma / d);
+  if (ma0 / d < 3) {
+    d /= 5;
+    ma0 = d * Math.ceil(ma / d);
+  }
+  if (ma0 / d < 5) {
+    d /= 2;
+    ma0 = d * Math.ceil(ma / d);
+  }
+  let cur = 0;
+  while (cur < ma0) {
+    cur += d;
+    ret.push(cur);
+  }
+  return ret;
+};

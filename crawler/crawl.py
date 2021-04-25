@@ -113,7 +113,7 @@ def crawl(conn: Connection, cur: Cursor) -> None:
         print(f'[START {contest.contest_slug}]')
         if crawl_task(conn, cur, contest):
             time.sleep(5)
-        # crawl_contest(conn, cur, contest)
+        crawl_contest(conn, cur, contest)
         print(f'[END {contest.contest_slug}]')
         time.sleep(10)
 

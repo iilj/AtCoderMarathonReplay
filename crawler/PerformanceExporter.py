@@ -1,6 +1,7 @@
 # Author: iilj
 
 import json
+import math
 import sqlite3
 from sqlite3.dbapi2 import Connection, Cursor
 from typing import Dict, List
@@ -19,6 +20,12 @@ def get_users(cur: Cursor, contest: str = 'ahc001') -> List[str]:
         user_name: str = row[0]
         users.append(user_name)
     return users
+
+
+def toRealRating(correctedRating: float) -> float:
+    if correctedRating >= 400:
+        return correctedRating
+    return 400 * (1 - math.log(400 / correctedRating))
 
 
 prepared: Dict[float, float] = {}
@@ -87,8 +94,8 @@ def main(contest_slug: str = 'ahc001') -> None:
     # 今回の提出者のレート（Center=1200）をつくる
     ratings: List[int] = []
     for user_name in users:
-        if False:  # user_name in scoredict.entries:
-            ratings.append(scoredict.entries[user_name].new_rating_beta)
+        if user_name in scoredict.entries:
+            ratings.append(toRealRating(scoredict.entries[user_name].new_rating_beta))
         else:
             ratings.append(1200)
     # print(ratings)
@@ -96,7 +103,7 @@ def main(contest_slug: str = 'ahc001') -> None:
     # パフォ計算する
     perfs = [get_inner_perf(i+1, ratings) for i in range(len(ratings))]
     borders = get_borders(ratings)
-    if True:
+    if contest_slug == 'ahc001':
         prepared.clear()
         rank_memo.clear()
         borders = get_borders(perfs)
@@ -114,4 +121,4 @@ def main(contest_slug: str = 'ahc001') -> None:
 
 
 if __name__ == '__main__':
-    main()
+    main('ahc002')
