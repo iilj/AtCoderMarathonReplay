@@ -1,6 +1,7 @@
 import Contest from '../interfaces/Contest';
 import Task from '../interfaces/Task';
 import Submission from '../interfaces/Submission';
+import Perfs from '../interfaces/Perfs';
 
 const CONTEST_SUBMISSION_MAP: Map<string, Submission[]> = new Map<
   string,
@@ -51,3 +52,21 @@ export const fetchContests = async (): Promise<Contest[]> =>
           return CONTESTS;
         })
     : Promise.resolve(CONTESTS);
+
+const PERF_MAP: Map<string, Perfs> = new Map<string, Perfs>();
+export const fetchPerfs = async (
+  contest?: string
+): Promise<Perfs | undefined> =>
+  contest !== undefined && contest.length > 0 && contest.startsWith('ahc')
+    ? !PERF_MAP.has(contest)
+      ? fetch(`${process.env.PUBLIC_URL}/perfs/${contest}.json`)
+          .catch((e) => {
+            throw Error(e);
+          })
+          .then(async (r) => {
+            const submissions = (await r.json()) as Perfs;
+            PERF_MAP.set(contest, submissions);
+            return submissions;
+          })
+      : Promise.resolve(PERF_MAP.get(contest) as Perfs)
+    : Promise.resolve(undefined);

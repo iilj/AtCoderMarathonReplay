@@ -13,3 +13,28 @@ code {
 a {
   color: #337ab7;
 }
+
+.difficulty-red {
+  color: #ff0000;
+}
+.difficulty-orange {
+  color: #ff8000;
+}
+.difficulty-yellow {
+  color: #c0c000;
+}
+.difficulty-blue {
+  color: #0000ff;
+}
+.difficulty-cyan {
+  color: #00c0c0;
+}
+.difficulty-green {
+  color: #008000;
+}
+.difficulty-brown {
+  color: #804000;
+}
+.difficulty-grey {
+  color: #808080;
+}

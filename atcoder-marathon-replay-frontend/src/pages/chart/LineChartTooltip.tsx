@@ -1,6 +1,8 @@
 import React from 'react';
 import dataFormat from 'dateformat';
 import { RankChartData } from '../../utils/RankReproducer';
+import Perfs from '../../interfaces/Perfs';
+import { getRatingColorClass } from '../../utils/RatingColor';
 
 interface RankLineChartTooltipPayloadContainer {
   color: string;
@@ -17,10 +19,11 @@ interface Props {
   active?: boolean;
   payload?: RankLineChartTooltipPayloadContainer[];
   label?: number;
+  perfs?: Perfs;
 }
 
 export const LineChartTooltip: React.FC<Props> = (props) => {
-  const { active, payload, label } = props;
+  const { active, payload, label, perfs } = props;
   if (!active || payload === undefined || label === undefined) return <></>;
   return (
     <div
@@ -71,6 +74,30 @@ export const LineChartTooltip: React.FC<Props> = (props) => {
                   </span>
                   <span className="recharts-tooltip-item-unit" />
                 </li>
+                {perfs && (
+                  <li
+                    className="recharts-tooltip-item"
+                    style={{
+                      display: 'block',
+                      paddingTop: '0px',
+                      paddingBottom: '4px',
+                      color: 'rgb(136, 132, 216)',
+                    }}
+                  >
+                    <span className="recharts-tooltip-item-name">
+                      Performance
+                    </span>
+                    <span className="recharts-tooltip-item-separator"> : </span>
+                    <span
+                      className={`recharts-tooltip-item-value ${getRatingColorClass(
+                        perfs.perfs[curPayload.rank - 1]
+                      )}`}
+                    >
+                      {perfs.perfs[curPayload.rank - 1]}
+                    </span>
+                    <span className="recharts-tooltip-item-unit" />
+                  </li>
+                )}
               </ul>
               <div style={{ fontSize: 10 }}>
                 {curPayload.type === 'update' ? (
