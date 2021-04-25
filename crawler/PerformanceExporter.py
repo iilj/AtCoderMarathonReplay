@@ -28,6 +28,10 @@ def toRealRating(correctedRating: float) -> float:
     return 400 * (1 - math.log(400 / correctedRating))
 
 
+def toInnerRating(realRating: float, comp: int = 1) -> float:
+    return realRating + 1200.0 * (math.sqrt(1 - math.pow(0.81, comp)) / (1 - math.pow(0.9, comp)) - 1) / (math.sqrt(19) - 1)
+
+
 prepared: Dict[float, float] = {}
 
 
@@ -76,6 +80,24 @@ def get_inner_perf(rated_rank: int, ratings: List[int]) -> int:
     return round((upper + lower) / 2)
 
 
+def main_ahc002(contest_slug: str = 'ahc002') -> None:
+    scoredict = AHCProvisionalScores('./lib/result_ahc002.csv')
+    perfs: List[float] = []
+    for entry in scoredict.entries.values():
+        perfs.append(toRealRating(entry.performance))
+    print(perfs)
+    borders = [0.5 + sum(perf >= perf_threshold for perf in perfs) for perf_threshold in range(400, 2800+1, 400)]
+    print(borders)
+
+    data = {
+        'borders': borders,
+        'perfs': perfs
+    }
+
+    with open(f'../atcoder-marathon-replay-frontend/public/perfs/{contest_slug}.json', mode='wt', encoding='utf-8') as f:
+        json.dump(data, f, separators=(',', ':'))
+
+
 def main(contest_slug: str = 'ahc001') -> None:
     # 前回までのレートを読み込む
     scoredict = AHCProvisionalScores('./lib/result_ahc001.csv')
@@ -95,10 +117,11 @@ def main(contest_slug: str = 'ahc001') -> None:
     ratings: List[int] = []
     for user_name in users:
         if user_name in scoredict.entries:
+            # ratings.append(toInnerRating(toRealRating(scoredict.entries[user_name].new_rating_beta), 2))
             ratings.append(toRealRating(scoredict.entries[user_name].new_rating_beta))
         else:
             ratings.append(1200)
-    # print(ratings)
+    print(ratings)
 
     # パフォ計算する
     perfs = [get_inner_perf(i+1, ratings) for i in range(len(ratings))]
@@ -109,7 +132,7 @@ def main(contest_slug: str = 'ahc001') -> None:
         borders = get_borders(perfs)
         perfs = [get_inner_perf(i+1, perfs) for i in range(len(ratings))]
     # print(perfs)
-    # print(borders)
+    print(borders)
 
     data = {
         'borders': borders,
@@ -121,4 +144,5 @@ def main(contest_slug: str = 'ahc001') -> None:
 
 
 if __name__ == '__main__':
-    main('ahc002')
+    # main('ahc002')
+    main_ahc002()
