@@ -54,9 +54,12 @@ class AHCProvisionalScores:
             for row in reader:
                 rank: int = int(row['Rank'])
                 name: str = row['Name']
-                score: int = int(row['Provisional Score'])
-                provisional_rank: int = int(row['Provisional Rank'])
-                provisional_score: int = int(row['Provisional Score'])
+                # score: int = int(row['Provisional Score'])
+                score: int = int(row['Score'])
+                # provisional_rank: int = int(row['Provisional Rank'])
+                provisional_rank = -1
+                # provisional_score: int = int(row['Provisional Score'])
+                provisional_score = -1
                 performance: int = int(row['Performance'])
                 old_rating_beta: int = int(row['Old Rating(β)'])
                 change: int = int(row['Change'])

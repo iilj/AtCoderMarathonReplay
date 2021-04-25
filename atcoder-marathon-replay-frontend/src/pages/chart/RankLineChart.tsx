@@ -19,6 +19,7 @@ import {
   getChartLineColor,
   getDatetimeTickFormatter,
   getDatetimeTicks,
+  getRankTicks,
 } from '../../utils/Chart';
 import { RankChartData } from '../../utils/RankReproducer';
 import { getRatingColorCode, RatingColors } from '../../utils/RatingColor';
@@ -48,6 +49,10 @@ export const RankLineChart: React.FC<Props> = (props) => {
     1
   );
 
+  const rankTicks = getRankTicks(maxRank);
+  const maxRankForChart = rankTicks[rankTicks.length - 1];
+  console.log(rankTicks);
+
   return (
     <div style={{ width: '100%', height: '500px', marginTop: '50px' }}>
       <ResponsiveContainer>
@@ -65,8 +70,8 @@ export const RankLineChart: React.FC<Props> = (props) => {
             [...perfs.borders, 0].map((top, index) => {
               const bottom: number =
                 index === 0
-                  ? maxRank
-                  : Math.min(maxRank, perfs.borders[index - 1]);
+                  ? maxRankForChart
+                  : Math.min(maxRankForChart, perfs.borders[index - 1]);
               if (bottom < top) return null;
               const color: string = getRatingColorCode(RatingColors[index + 1]);
               return (
@@ -98,6 +103,8 @@ export const RankLineChart: React.FC<Props> = (props) => {
             name="rank"
             label={{ value: 'Rank', angle: -90, position: 'insideLeft' }}
             reversed
+            domain={[0, maxRankForChart]}
+            ticks={rankTicks}
           />
           <Tooltip content={<LineChartTooltip perfs={perfs} />} />
           <Legend />
