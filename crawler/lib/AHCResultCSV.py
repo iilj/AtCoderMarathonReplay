@@ -42,12 +42,12 @@ class AHCRankEntry:
                 f'change={self.change} new_rating_beta={self.new_rating_beta}>')
 
 
-class AHCProvisionalScores:
-    name2score: Dict[str, int]
+class AHCScoresCSV:
+    name2provisionalscore: Dict[str, int]
     entries: Dict[str, AHCRankEntry]
 
     def __init__(self, fn: str = 'result_ahc001.csv') -> None:
-        self.name2score = {}
+        self.name2provisionalscore = {}
         self.entries = {}
         with open(fn, encoding='utf_8') as f:
             reader: csv.DictReader = csv.DictReader(f)
@@ -56,16 +56,15 @@ class AHCProvisionalScores:
                 name: str = row['Name']
                 # score: int = int(row['Provisional Score'])
                 score: int = int(row['Score'])
-                # provisional_rank: int = int(row['Provisional Rank'])
-                provisional_rank = -1
-                # provisional_score: int = int(row['Provisional Score'])
-                provisional_score = -1
+                provisional_rank: int = int(row['Provisional Rank']) if ('Provisional Rank' in row) else -1
+                provisional_score: int = int(row['Provisional Score']) if ('Provisional Score' in row) else -1
                 performance: int = int(row['Performance'])
                 old_rating_beta: int = int(row['Old Rating(β)'])
                 change: int = int(row['Change'])
                 new_rating_beta: int = int(row['New Rating(β)'])
 
-                self.name2score[name] = score
+                if provisional_score != -1:
+                    self.name2provisionalscore[name] = provisional_score
                 self.entries[name] = AHCRankEntry(
                     rank,
                     name,
@@ -109,11 +108,11 @@ class AHCProvisionalScores:
                 continue
             # assert d['submission_id'] in last_submission_id_set
             assert isinstance(d['user_name'], str)
-            if not (d['user_name'] in self.name2score):
+            if not (d['user_name'] in self.name2provisionalscore):
                 continue
             # assert d['user_name'] in self.name2score
             assert d['user_name'] in user_score_list_map
-            provisional_score: int = self.name2score[d['user_name']]
+            provisional_score: int = self.name2provisionalscore[d['user_name']]
             if len(user_score_list_map[d['user_name']]) == 1 or provisional_score > user_score_list_map[d['user_name']][-2]:
                 d['score'] = provisional_score
             else:
@@ -122,7 +121,7 @@ class AHCProvisionalScores:
 
 
 def main() -> None:
-    scoredict = AHCProvisionalScores()
+    scoredict = AHCScoresCSV()
 
 
 if __name__ == '__main__':

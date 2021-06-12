@@ -1,12 +1,13 @@
 # Author: iilj
 
+import os
 import json
 import math
 import sqlite3
 from sqlite3.dbapi2 import Connection, Cursor
-from typing import Dict, List
+from typing import Dict, List, Optional
 
-from lib.AHCResultCSV import AHCProvisionalScores
+from lib.AHCResultCSV import AHCScoresCSV
 
 
 def get_users(cur: Cursor, contest: str = 'ahc001') -> List[str]:
@@ -18,7 +19,8 @@ def get_users(cur: Cursor, contest: str = 'ahc001') -> List[str]:
                            '    SELECT end_time_unix FROM contests WHERE contest_slug = ?'
                            ')', (contest, contest, contest)):
         user_name: str = row[0]
-        users.append(user_name)
+        if user_name != 'wata_admin':
+            users.append(user_name)
     return users
 
 
@@ -80,69 +82,100 @@ def get_inner_perf(rated_rank: int, ratings: List[int]) -> int:
     return round((upper + lower) / 2)
 
 
-def main_ahc002(contest_slug: str = 'ahc002') -> None:
-    scoredict = AHCProvisionalScores('./lib/result_ahc002.csv')
-    perfs: List[float] = []
-    for entry in scoredict.entries.values():
-        perfs.append(toRealRating(entry.performance))
-    print(perfs)
-    borders = [0.5 + sum(perf >= perf_threshold for perf in perfs) for perf_threshold in range(400, 2800+1, 400)]
-    print(borders)
-
-    data = {
-        'borders': borders,
-        'perfs': perfs
-    }
-
-    with open(f'../atcoder-marathon-replay-frontend/public/perfs/{contest_slug}.json', mode='wt', encoding='utf-8') as f:
-        json.dump(data, f, separators=(',', ':'))
+def inner_perfs_history_to_innter_rating(inner_perfs_history: List[int]) -> float:
+    # 先頭が一番古く，末尾が一番新しい
+    numer: float = 0  # 分子
+    denom: float = 0  # 分母
+    coef: float = 1.0
+    for inner_perf in reversed(inner_perfs_history):  # 新しい方から走査
+        coef *= 0.9
+        numer += coef * inner_perf
+        denom += coef
+    assert (denom > 0)
+    inner_rating: float = numer / denom
+    return inner_rating
 
 
-def main(contest_slug: str = 'ahc001') -> None:
-    # 前回までのレートを読み込む
-    scoredict = AHCProvisionalScores('./lib/result_ahc001.csv')
+def trace_innter_perf() -> Dict[str, List[int]]:
+    """内部パフォーマンスおよび内部レートを計算しながら JSON を出力する．
 
-    # 今回の提出者リストを作る
+    CSV がある場合はそちらを使う．
+
+    CSV がない場合は DB からユーザ一覧を取得して，各順位に対するパフォ計算を行う．
+    この場合は各ユーザの順位がわからないので，ユーザごとの内部パフォーマンス履歴は更新しない．
+    最新の，まだ CSV が用意されていないコンテストを想定．
+
+    Returns:
+        Dict[str, List[int]]: [description]
+    """
+    # DB 接続
     database: str = 'db.db'
     conn: Connection = sqlite3.connect(database)
     cur: Cursor = conn.cursor()
 
-    users: List[str] = get_users(cur, contest_slug)
-    # print(users)
-    print(len(users))
+    contest_slugs: List[str] = ['ahc001', 'ahc002', 'ahc003']
+    # user_inner_perfs[user_name] := [innter_perf, ...]
+    user_inner_perfs: Dict[str, List[int]] = {}
 
-    conn.close()
-
-    # 今回の提出者のレート（Center=1200）をつくる
-    ratings: List[int] = []
-    for user_name in users:
-        if user_name in scoredict.entries:
-            # ratings.append(toInnerRating(toRealRating(scoredict.entries[user_name].new_rating_beta), 2))
-            ratings.append(toRealRating(scoredict.entries[user_name].new_rating_beta))
-        else:
-            ratings.append(1200)
-    print(ratings)
-
-    # パフォ計算する
-    perfs = [get_inner_perf(i+1, ratings) for i in range(len(ratings))]
-    borders = get_borders(ratings)
-    if contest_slug == 'ahc001':
+    for contest_slug in contest_slugs:
         prepared.clear()
         rank_memo.clear()
-        borders = get_borders(perfs)
-        perfs = [get_inner_perf(i+1, perfs) for i in range(len(ratings))]
-    # print(perfs)
-    print(borders)
+        fn: str = f'./lib/result_{contest_slug}.csv'
+        csv: Optional[AHCScoresCSV] = None
+        users: List[str]
+        if os.path.exists(fn):
+            csv = AHCScoresCSV(fn)
+            users = [entry.name for entry in csv.entries.values()]
+        else:
+            users = get_users(cur, contest_slug)
 
-    data = {
-        'borders': borders,
-        'perfs': perfs
-    }
+        # この回の参加者の内部レート（Center=1200）をつくる
+        inner_ratings: List[int] = []
+        for user_name in users:
+            if user_name in user_inner_perfs:
+                inner_ratings.append(inner_perfs_history_to_innter_rating(user_inner_perfs[user_name]))
+            else:
+                inner_ratings.append(1200)
+        inner_ratings.sort()
 
-    with open(f'../atcoder-marathon-replay-frontend/public/perfs/{contest_slug}.json', mode='wt', encoding='utf-8') as f:
-        json.dump(data, f, separators=(',', ':'))
+        # パフォ計算する
+        perfs = [get_inner_perf(i+1, inner_ratings) for i in range(len(inner_ratings))]
+        borders = get_borders(inner_ratings)
+        # AHC001 のときは，得られた内部パフォーマンスを内部レート的に用いて，内部パフォーマンスを再計算する
+        # https://www.dropbox.com/s/ne358pdixfafppm/AHC_rating.pdf?dl=0
+        if contest_slug == 'ahc001':
+            prepared.clear()
+            rank_memo.clear()
+            borders = get_borders(perfs)
+            perfs = [get_inner_perf(i+1, perfs) for i in range(len(perfs))]
+        # print(perfs)
+        print(borders)
+
+        # 内部パフォーマンスを保存する
+        if csv is not None:
+            for entry in csv.entries.values():
+                user_name = entry.name
+                inner_perf: int = perfs[entry.rank - 1]
+                if (not user_name in user_inner_perfs):
+                    user_inner_perfs[user_name] = [inner_perf]
+                else:
+                    user_inner_perfs[user_name].append(inner_perf)
+
+        # データを JSON に出力する
+        data = {
+            'borders': borders,
+            'perfs': perfs
+        }
+        with open(f'../atcoder-marathon-replay-frontend/public/perfs/{contest_slug}.json', mode='wt', encoding='utf-8') as f:
+            json.dump(data, f, separators=(',', ':'))
+
+    conn.close()
+    return user_inner_perfs
+
+
+def main() -> None:
+    trace_innter_perf()
 
 
 if __name__ == '__main__':
-    # main('ahc002')
-    main_ahc002()
+    main()
