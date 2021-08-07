@@ -113,7 +113,7 @@ def trace_innter_perf() -> Dict[str, List[int]]:
     conn: Connection = sqlite3.connect(database)
     cur: Cursor = conn.cursor()
 
-    contest_slugs: List[str] = ['ahc001', 'ahc002', 'ahc003', 'ahc004']
+    contest_slugs: List[str] = ['ahc001', 'ahc002', 'ahc003', 'ahc004', 'ahc005']
     # user_inner_perfs[user_name] := [innter_perf, ...]
     user_inner_perfs: Dict[str, List[int]] = {}
 
