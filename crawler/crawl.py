@@ -75,7 +75,7 @@ def crawl_contest(conn: Connection, cur: Cursor, contest: ContestListPage.Contes
         if result.is_last_page:
             break
         pagenum += 1
-        time.sleep(10)
+        time.sleep(5)
     cur.execute('UPDATE contests SET crawl_completed = 1 WHERE contest_slug = ?', (slug,))
     conn.commit()
 
@@ -115,7 +115,7 @@ def crawl(conn: Connection, cur: Cursor) -> None:
             time.sleep(5)
         crawl_contest(conn, cur, contest)
         print(f'[END {contest.contest_slug}]')
-        time.sleep(10)
+        time.sleep(5)
 
 
 def main() -> None:
