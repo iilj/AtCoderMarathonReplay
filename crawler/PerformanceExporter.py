@@ -96,6 +96,22 @@ def inner_perfs_history_to_innter_rating(inner_perfs_history: List[int]) -> floa
     return inner_rating
 
 
+def get_contests_after_ahc001(cur: Cursor) -> List[str]:
+    """AHC001 以降のコンテスト slng 一覧を返す．
+
+    Args:
+        cur (Cursor): [description]
+
+    Returns:
+        List[str]: コンテスト slng 一覧
+    """
+    contest_slugs: List[str] = []
+    for row in cur.execute('SELECT contest_slug FROM contests WHERE start_time_unix >= 1614999600 '
+                           'ORDER BY end_time_unix ASC, contest_slug ASC'):
+        contest_slugs.append(row[0])
+    return contest_slugs
+
+
 def trace_innter_perf() -> Dict[str, List[int]]:
     """内部パフォーマンスおよび内部レートを計算しながら JSON を出力する．
 
@@ -113,7 +129,8 @@ def trace_innter_perf() -> Dict[str, List[int]]:
     conn: Connection = sqlite3.connect(database)
     cur: Cursor = conn.cursor()
 
-    contest_slugs: List[str] = ['ahc001', 'ahc002', 'ahc003', 'ahc004', 'ahc005']
+    # contest_slugs: List[str] = ['ahc001', 'ahc002', 'ahc003', 'ahc004', 'ahc005']
+    contest_slugs: List[str] = get_contests_after_ahc001(cur)
     # user_inner_perfs[user_name] := [innter_perf, ...]
     user_inner_perfs: Dict[str, List[int]] = {}
 

@@ -43,11 +43,14 @@ export const ChartPage: React.FC<Props> = (props) => {
   );
 
   const { data: perfs, error: perfsError } = useSWR<Perfs | undefined, Error>(
-    paramUser.length > 0 && paramContest.length > 0
+    paramUser.length > 0 && paramContest.length > 0 && contests !== undefined
       ? `/perfs/${paramContest}`
       : null,
     () => {
-      return fetchPerfs(paramContest);
+      const tmpContest: Contest | undefined = contests?.find(
+        (value) => value.contest_slug === paramContest
+      );
+      return fetchPerfs(paramContest, tmpContest);
     }
   );
 

@@ -3,6 +3,8 @@ import Task from '../interfaces/Task';
 import Submission from '../interfaces/Submission';
 import Perfs from '../interfaces/Perfs';
 
+const AHC001_START_TIME = 1614999600;
+
 const CONTEST_SUBMISSION_MAP: Map<string, Submission[]> = new Map<
   string,
   Submission[]
@@ -55,18 +57,22 @@ export const fetchContests = async (): Promise<Contest[]> =>
 
 const PERF_MAP: Map<string, Perfs> = new Map<string, Perfs>();
 export const fetchPerfs = async (
-  contest?: string
+  contestSlug: string,
+  contest: Contest | undefined
 ): Promise<Perfs | undefined> =>
-  contest !== undefined && contest.length > 0 && contest.startsWith('ahc')
-    ? !PERF_MAP.has(contest)
-      ? fetch(`${process.env.PUBLIC_URL}/perfs/${contest}.json`)
+  contestSlug !== undefined &&
+  contestSlug.length > 0 &&
+  contest !== undefined &&
+  contest.start_time_unix >= AHC001_START_TIME
+    ? !PERF_MAP.has(contestSlug)
+      ? fetch(`${process.env.PUBLIC_URL}/perfs/${contestSlug}.json`)
           .catch((e) => {
             throw Error(e);
           })
           .then(async (r) => {
             const submissions = (await r.json()) as Perfs;
-            PERF_MAP.set(contest, submissions);
+            PERF_MAP.set(contestSlug, submissions);
             return submissions;
           })
-      : Promise.resolve(PERF_MAP.get(contest) as Perfs)
+      : Promise.resolve(PERF_MAP.get(contestSlug) as Perfs)
     : Promise.resolve(undefined);
