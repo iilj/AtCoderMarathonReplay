@@ -112,10 +112,10 @@ def crawl(conn: Connection, cur: Cursor) -> None:
             continue
         print(f'[START {contest.contest_slug}]')
         if crawl_task(conn, cur, contest):
-            time.sleep(5)
+            time.sleep(3)
         crawl_contest(conn, cur, contest)
         print(f'[END {contest.contest_slug}]')
-        time.sleep(5)
+        time.sleep(3)
 
 
 def main() -> None:
