@@ -103,6 +103,7 @@ def crawl_task(conn: Connection, cur: Cursor, contest: ContestListPage.Contest) 
 
 def crawl(conn: Connection, cur: Cursor) -> None:
     clprr: ContestListPageRequestResult = ContestListPageRequestResult.create_from_request()
+    print(clprr)
     # slugs: List[str] = [contest.contest_slug for contest in clprr.contest_list_page.contests]
     slugs_crawled: Set[str] = set([row[0]
                                    for row in cur.execute('SELECT contest_slug FROM contests WHERE crawl_completed = 1')])

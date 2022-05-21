@@ -22,7 +22,8 @@ CREATE TABLE contests(
     start_time_unix INTEGER,
     end_time_unix INTEGER,
     crawl_completed INTEGER DEFAULT 0,
-    closed INTEGER DEFAULT 0
+    closed INTEGER DEFAULT 0,
+    rated INTEGER  DEFAULT 0
 );
 
 CREATE TABLE tasks(
