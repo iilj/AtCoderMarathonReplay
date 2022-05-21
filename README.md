@@ -24,9 +24,11 @@ AtCoder で行われたマラソンコンテストにおける順位および得
 - hokudai-hitachi2017-2: 30 / 150
 - hokudai-hitachi2017-1: 30 / 150
 
+
 ## atcoder-marathon-replay-frontend
 
 TypeScript + React 製のフロントエンドです．
+
 
 ### セットアップ
 
@@ -35,12 +37,14 @@ $ cd atcoder-marathon-replay-frontend
 $ yarn
 ```
 
+
 ### ローカルサーバ起動
 
 ```sh
 $ cd atcoder-marathon-replay-frontend
 $ yarn start
 ```
+
 
 ### ビルド
 
@@ -51,9 +55,11 @@ $ cd atcoder-marathon-replay-frontend
 $ yarn build
 ```
 
+
 ## crawler
 
 Python 製の，コンテスト提出一覧クローラです．かなり適当です．適当に SQLite の DB に情報を突っ込んだり出したりしています．
+
 
 ### セットアップ
 
@@ -64,32 +70,36 @@ $ sqlite3 db.db
 > .read db_create.sql
 ```
 
+
 ### クロール
 
-コンテスト中の提出一覧をクロールします．
+AHC クラスのコンテストの提出一覧をクロールします．
 
 ```sh
 $ cd crawler
-$ python crawl.py ahc001
+$ python crawl.py
 ```
+
 
 ### 提出一覧エクスポート
 
-フロントエンドの public ディレクトリ内にエクスポートします．
+AHC クラスのコンテストの提出一覧を，フロントエンドの public ディレクトリ内に json 形式でエクスポートします．
 
 ```sh
 $ cd crawler
-$ python export.py ahc001
+$ python export.py
 ```
 
-### コンテスト一覧エクスポート
 
-フロントエンドの public ディレクトリ内にエクスポートします．
+### パフォーマンス情報エクスポート
+
+コンテストごとの，色境界の順位情報，および順位→パフォーマンスのマッピング情報を，フロントエンドの public ディレクトリ内に json 形式でエクスポートします．
 
 ```sh
 $ cd crawler
-$ python export_contests.py
+$ python PerformanceExporter.py
 ```
+
 
 ## 連絡先
 
