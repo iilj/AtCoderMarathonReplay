@@ -1,4 +1,4 @@
-from typing import List, Match, Optional, Pattern
+from typing import List, Match, Optional, Pattern, Tuple
 from bs4 import BeautifulSoup
 from bs4.element import Tag
 import re
@@ -20,6 +20,7 @@ class ContestListPage:
         contest_slug: str
         contest_name: str
         duration_minutes: int
+        rated: bool
 
         contest_href_pattern: Pattern[str] = re.compile(r'/contests/([^/]+)')
         duration_pattern: Pattern[str] = re.compile(r'(\d+):(\d+)')
@@ -49,9 +50,13 @@ class ContestListPage:
             minutes: int = int(duration_match.group(2))
             self.duration_minutes = hours * 60 + minutes
 
+            rated_range_str: str = table_data_list[3].get_text().strip()
+            self.rated = (rated_range_str == 'All')
+
         def __repr__(self) -> str:
             return ('<Contest '
-                    f'time={self.time}, slug={self.contest_slug}, name={self.contest_name}, duration={self.duration_minutes}>')
+                    f'time={self.time}, slug={self.contest_slug}, name={self.contest_name}, '
+                    f'duration={self.duration_minutes}, rated={self.rated}>')
 
     contests: List[Contest]
 

@@ -3,8 +3,6 @@ import Task from '../interfaces/Task';
 import Submission from '../interfaces/Submission';
 import Perfs from '../interfaces/Perfs';
 
-const AHC001_START_TIME = 1614999600;
-
 const CONTEST_SUBMISSION_MAP: Map<string, Submission[]> = new Map<
   string,
   Submission[]
@@ -60,10 +58,7 @@ export const fetchPerfs = async (
   contestSlug: string,
   contest: Contest | undefined
 ): Promise<Perfs | undefined> =>
-  contestSlug !== undefined &&
-  contestSlug.length > 0 &&
-  contest !== undefined &&
-  contest.start_time_unix >= AHC001_START_TIME
+  contestSlug !== undefined && contestSlug.length > 0 && contest !== undefined
     ? !PERF_MAP.has(contestSlug)
       ? fetch(`${process.env.PUBLIC_URL}/perfs/${contestSlug}.json`)
           .catch((e) => {

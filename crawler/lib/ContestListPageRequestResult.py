@@ -13,7 +13,8 @@ class ContestListPageRequestResult:
         return (f'<ContestListPageRequestResult contest_list_page={self.contest_list_page}>')
 
     def get(self) -> None:
-        url: str = (f'https://atcoder.jp/contests/archive?ratedType=0&category=1200&keyword=')
+        # url: str = (f'https://atcoder.jp/contests/archive?ratedType=0&category=1200&keyword=')
+        url: str = (f'https://atcoder.jp/contests/archive?ratedType=4&category=0&keyword=')
         headers = {'accept-language': 'ja,en-US;q=0.9,en;q=0.8'}
         response: Response = requests.get(url, headers=headers)
         assert response.status_code == 200

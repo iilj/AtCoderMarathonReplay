@@ -5,7 +5,7 @@ import json
 import sqlite3
 from sqlite3.dbapi2 import Connection, Cursor
 from typing import Dict, List, Set, Tuple, Union
-from lib.AHCResultCSV import AHCScoresCSV
+from lib.csv.AHCResultCSV import AHCScoresCSV
 
 
 score_fix_ratio: Dict[str, Dict[str, float]] = {
@@ -69,7 +69,7 @@ def export_submissions(cur: Cursor, contest: str = 'ahc001') -> None:
     last_submission_id_set: Set[int] = set(user_last_submission_id_map.values())
     # for ahc001
     if contest == 'ahc001':
-        provisional_score_mapper = AHCScoresCSV('./lib/result_ahc001.csv')
+        provisional_score_mapper = AHCScoresCSV('./lib/csv/result_ahc001.csv')
         data = provisional_score_mapper.fix_data(data, last_submission_id_set)
     # for hokudai-hitachi2020, etc
     elif contest in score_fix_ratio:
