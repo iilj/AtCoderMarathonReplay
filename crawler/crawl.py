@@ -41,10 +41,10 @@ def crawl_contest(conn: Connection, cur: Cursor, contest: ContestListPage.Contes
             count_result = cur.fetchone()
             exists_in_table = (count_result[0] == 1)
             if not exists_in_table:
-                cur.execute('INSERT INTO contests VALUES (?,?,?,?,?,?)',
+                cur.execute('INSERT INTO contests VALUES (?,?,?,?,?,?,?)',
                             (slug, contest.contest_name, contest.time_unix,
                              int((contest.time + timedelta(minutes=contest.duration_minutes)).timestamp()),
-                             1, 1))
+                             1, 1, int(contest.rated)))
             conn.commit()
             break
         else:
@@ -56,10 +56,10 @@ def crawl_contest(conn: Connection, cur: Cursor, contest: ContestListPage.Contes
             count_result = cur.fetchone()
             exists_in_table = (count_result[0] == 1)
             if not exists_in_table:
-                cur.execute('INSERT INTO contests VALUES (?,?,?,?,?,?)',
+                cur.execute('INSERT INTO contests VALUES (?,?,?,?,?,?,?)',
                             (slug, result.submission_list_page.contest_title,
                              result.submission_list_page.contest_starttime_unix,
-                             result.submission_list_page.contest_endtime_unix, 0, 0))
+                             result.submission_list_page.contest_endtime_unix, 0, 0, int(contest.rated)))
 
         # 提出情報挿入
         seq_of_parameters: List[DBInsertData] = result.generate_insert_data()

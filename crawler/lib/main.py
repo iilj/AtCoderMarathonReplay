@@ -4,7 +4,7 @@ import json
 from datetime import timedelta
 from typing import Dict, List, Pattern, Union
 from ContestListPageRequestResult import ContestListPageRequestResult
-from AHCResultCSV import AHCScoresCSV
+from csv.AHCResultCSV import AHCScoresCSV
 
 
 def crawl() -> None:
