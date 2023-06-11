@@ -2,8 +2,15 @@ from __future__ import annotations
 from typing import List, Optional, Tuple
 import requests
 from requests.models import Response
+from requests.sessions import Session
 
 from lib.SubmissionListPage import SubmissionListPage, SubmissionStatus
+
+from onlinejudge._implementation.utils import (
+    default_cookie_path,
+    with_cookiejar,
+    get_default_session,
+)
 
 DBInsertData = Tuple[int, str, str, int,
                      int, str, str, int, int, int, SubmissionStatus, int, int, int]
@@ -28,7 +35,9 @@ class SubmissionListPageRequestResult:
     def get(self) -> None:
         url: str = (f'https://atcoder.jp/contests/{self.contest}/submissions?'
                     f'f.LanguageName=&f.Status=&f.Task=&f.User=&orderBy=created&page={self.pagenum}')
-        response: Response = requests.get(url)
+        sess: Session
+        with with_cookiejar(get_default_session(), path=default_cookie_path) as sess:
+            response: Response = sess.get(url)
         if response.status_code == 404:
             self.is_closed = True
         else:

@@ -48,8 +48,11 @@ def crawl_contest(conn: Connection, cur: Cursor, contest: ContestListPage.Contes
             conn.commit()
             break
         else:
-            print(f' -> Page {result.pagenum}: size={len(result.submission_list_page.submissions)}, '
-                  f'min={result.submission_list_page.submissions[0].time}, max={result.submission_list_page.submissions[-1].time}')
+            if len(result.submission_list_page.submissions) == 0:
+                print(f' -> Page {result.pagenum}: size={len(result.submission_list_page.submissions)}')
+            else:
+                print(f' -> Page {result.pagenum}: size={len(result.submission_list_page.submissions)}, '
+                      f'min={result.submission_list_page.submissions[0].time}, max={result.submission_list_page.submissions[-1].time}')
 
             # コンテスト情報挿入
             cur.execute('SELECT COUNT(*) FROM contests WHERE contest_slug = ?', (slug,))
@@ -72,7 +75,7 @@ def crawl_contest(conn: Connection, cur: Cursor, contest: ContestListPage.Contes
         conn.commit()
 
         # 最後のページなら抜ける
-        if result.is_last_page:
+        if result.is_last_page or len(result.submission_list_page.submissions) == 0:
             break
         pagenum += 1
         time.sleep(3)
