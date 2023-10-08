@@ -12,8 +12,9 @@ from onlinejudge._implementation.utils import (
     get_default_session,
 )
 
-DBInsertData = Tuple[int, str, str, int,
-                     int, str, str, int, int, int, SubmissionStatus, int, int, int]
+DBInsertData = Tuple[
+    int, str, str, int, int, str, str, int, int, int, SubmissionStatus, int, int, int
+]
 
 
 class SubmissionListPageRequestResult:
@@ -24,17 +25,21 @@ class SubmissionListPageRequestResult:
     is_last_page: bool
     is_closed: bool
 
-    def __init__(self, contest: str = 'ahc001', pagenum: int = 1) -> None:
+    def __init__(self, contest: str = "ahc001", pagenum: int = 1) -> None:
         self.contest = contest
         self.pagenum = pagenum
 
     def __repr__(self) -> str:
-        return (f'<SubmissionListPageRequestResult contest={self.contest} pagenum={self.pagenum} '
-                f'is_last_page={self.is_last_page} submission_list_page={self.submission_list_page}>')
+        return (
+            f"<SubmissionListPageRequestResult contest={self.contest} pagenum={self.pagenum} "
+            f"is_last_page={self.is_last_page} submission_list_page={self.submission_list_page}>"
+        )
 
     def get(self) -> None:
-        url: str = (f'https://atcoder.jp/contests/{self.contest}/submissions?'
-                    f'f.LanguageName=&f.Status=&f.Task=&f.User=&orderBy=created&page={self.pagenum}')
+        url: str = (
+            f"https://atcoder.jp/contests/{self.contest}/submissions?"
+            f"f.LanguageName=&f.Status=&f.Task=&f.User=&orderBy=created&page={self.pagenum}"
+        )
         sess: Session
         with with_cookiejar(get_default_session(), path=default_cookie_path) as sess:
             response: Response = sess.get(url)
@@ -46,11 +51,11 @@ class SubmissionListPageRequestResult:
         self.html = response.text
 
     def read_sample_html(self) -> None:
-        with open('sample.html') as f:
+        with open("sample.html") as f:
             self.html = f.read()
 
     def write_as_sample(self) -> None:
-        with open('sample.html', mode='w') as f:
+        with open("sample.html", mode="w") as f:
             f.write(self.html)
 
     def parse(self) -> None:
@@ -60,17 +65,23 @@ class SubmissionListPageRequestResult:
         else:
             self.submission_list_page = SubmissionListPage(self.html)
             self.is_last_page = any(
-                submission.time >= self.submission_list_page.contest_endtime for submission in self.submission_list_page.submissions)
+                submission.time >= self.submission_list_page.contest_endtime
+                for submission in self.submission_list_page.submissions
+            )
 
     @classmethod
-    def create_from_request(cls, contest: str = 'ahc001', pagenum: int = 1) -> SubmissionListPageRequestResult:
+    def create_from_request(
+        cls, contest: str = "ahc001", pagenum: int = 1
+    ) -> SubmissionListPageRequestResult:
         res: SubmissionListPageRequestResult = cls(contest, pagenum)
         res.get()
         res.parse()
         return res
 
     @classmethod
-    def create_from_sample(cls, contest: str = 'ahc001', pagenum: int = 1) -> SubmissionListPageRequestResult:
+    def create_from_sample(
+        cls, contest: str = "ahc001", pagenum: int = 1
+    ) -> SubmissionListPageRequestResult:
         res: SubmissionListPageRequestResult = cls(contest, pagenum)
         res.read_sample_html()
         res.parse()
@@ -81,9 +92,21 @@ class SubmissionListPageRequestResult:
         if self.submission_list_page is not None:
             for submission in self.submission_list_page.submissions:
                 if submission.time < self.submission_list_page.contest_endtime:
-                    data: DBInsertData = (submission.submission_id, submission.contest, submission.task, self.pagenum,
-                                          submission.time_unix, submission.user_name, submission.lang_name, submission.lang_id,
-                                          submission.score, submission.source_length, submission.status,
-                                          submission.time_consumption, submission.memory_consumption, submission.magnification)
+                    data: DBInsertData = (
+                        submission.submission_id,
+                        submission.contest,
+                        submission.task,
+                        self.pagenum,
+                        submission.time_unix,
+                        submission.user_name,
+                        submission.lang_name,
+                        submission.lang_id,
+                        submission.score,
+                        submission.source_length,
+                        submission.status,
+                        submission.time_consumption,
+                        submission.memory_consumption,
+                        submission.magnification,
+                    )
                     ls.append(data)
         return ls
