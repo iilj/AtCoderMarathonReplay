@@ -10,11 +10,17 @@ class ContestUserState {
     this.score = 0;
     this.afterTargetUser = false;
   }
-  addSubmission(contestSubmission: Submission): void {
+  addSubmission(contestSubmission: Submission, inverted: boolean): void {
     const val = contestSubmission.score;
     if (this.taskScoreMap.has(contestSubmission.task)) {
       const curVal = this.taskScoreMap.get(contestSubmission.task) as number;
-      if (curVal > val) return;
+      if (inverted) {
+        // loss 増加
+        if (curVal < val || val === 0) return;
+      } else {
+        // score 減少
+        if (curVal > val) return;
+      }
       this.score += val - curVal;
     } else {
       this.score += val;
@@ -39,7 +45,8 @@ export interface RankChartData {
 
 export const getRankSequence = (
   user: string,
-  contestSubmissions: Submission[]
+  contestSubmissions: Submission[],
+  inverted: boolean
 ): RankChartData[] => {
   if (
     !contestSubmissions.some(
@@ -52,11 +59,11 @@ export const getRankSequence = (
   // assert ユーザがいる
 
   // 一度目のシミュレート（各ユーザの得点計算のみ）
-  const scoreSet = new Set<number>();
+  const scoreSet = new Set<number>(); // ありうる得点一覧
   scoreSet.add(0);
-  let userLength;
+  let userLength; // ユーザ数
   {
-    const userSubmissionsMap = new Map<string, Submission[]>();
+    const userSubmissionsMap = new Map<string, Submission[]>(); // ユーザ名→提出一覧
     contestSubmissions.forEach((contestSubmission: Submission): void => {
       if (userSubmissionsMap.has(contestSubmission.user_name)) {
         userSubmissionsMap
@@ -73,7 +80,7 @@ export const getRankSequence = (
     userSubmissionsMap.forEach((userSubmissions: Submission[]): void => {
       const contestUserState = new ContestUserState();
       userSubmissions.forEach((contestSubmission: Submission): void => {
-        contestUserState.addSubmission(contestSubmission);
+        contestUserState.addSubmission(contestSubmission, inverted);
         scoreSet.add(contestUserState.score);
       });
     });
@@ -82,9 +89,15 @@ export const getRankSequence = (
   // 得点一覧を生成
   const scores: number[] = Array.from(scoreSet.values());
   void scores.sort((a, b) => a - b);
+  if (inverted) {
+    // 0, Max, Max-1, ..., 2, 1 の順にする
+    scores.reverse();
+    scores.pop();
+    scores.unshift(0);
+  }
 
   // 座圧用辞書を作成
-  const compress = new Map<number, number>();
+  const compress = new Map<number, number>(); // 得点→インデックス
   scores.forEach((score: number, index: number): void => {
     compress.set(score, index);
   });
@@ -93,6 +106,7 @@ export const getRankSequence = (
   const bit: BinaryIndexedTree = new BinaryIndexedTree(scores.length); // 各得点に何人いるか
   bit.add(compress.get(0) as number, userLength); // 全員を 0 点として扱う
   let curScore = 0;
+  let curIndex = 0;
   let curRank = 1;
   const seq: RankChartData[] = [];
   {
@@ -108,7 +122,7 @@ export const getRankSequence = (
       ) as ContestUserState;
       const oldScore = contestUserState.score;
       // const oldAfterTargetUser = contestUserState.afterTargetUser;
-      contestUserState.addSubmission(contestSubmission);
+      contestUserState.addSubmission(contestSubmission, inverted);
       // contestUserState.afterTargetUser = false;
       const newScore = contestUserState.score;
       if (newScore !== oldScore) {
@@ -120,6 +134,7 @@ export const getRankSequence = (
         if (contestSubmission.user_name === user) {
           // curScore 以上の得点を取っている人数が順位
           curScore = newScore;
+          curIndex = newIndex;
           curRank = bit.query(newIndex, scores.length);
           seq.push({
             user: user,
@@ -132,22 +147,22 @@ export const getRankSequence = (
             status: contestSubmission.status,
           });
         } else {
-          if (newScore < curScore) {
+          if (newIndex < curIndex) {
             // 追い越さなかった
             contestUserState.afterTargetUser = false;
             return;
-          } else if (newScore === curScore) {
+          } else if (newIndex === curIndex) {
             // 同点になったけど追い越さなかった
             contestUserState.afterTargetUser = true;
             return;
           } else {
             // 追い越したか，あるいは最初から高い順位にいるか
-            if (oldScore > curScore) {
+            if (oldIndex > curIndex) {
               // 最初から得点が高い
               contestUserState.afterTargetUser = false;
               return;
             } else if (
-              oldScore === curScore &&
+              oldIndex === curIndex &&
               !contestUserState.afterTargetUser
             ) {
               // ターゲットユーザよりも先に今の得点を取っていた
