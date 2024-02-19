@@ -31,6 +31,16 @@ interface Props {
   perfs?: Perfs;
 }
 
+const decreasingOrderContestSlugs = [
+  'ahc017',
+  'ahc018',
+  'toyota-hc-2023spring',
+  'ahc019',
+  'ahc025',
+  'ahc027',
+  'ahc030',
+];
+
 export const ChartBlock: React.FC<Props> = (props) => {
   const { users, contest, contestSubmissions, perfs } = props;
 
@@ -74,7 +84,11 @@ export const ChartBlock: React.FC<Props> = (props) => {
 
   const sequences: [string, RankChartData[]][] = users.map((user) => [
     user,
-    getRankSequence(user, contestSubmissions),
+    getRankSequence(
+      user,
+      contestSubmissions,
+      decreasingOrderContestSlugs.includes(contest.contest_slug)
+    ),
   ]);
   if (sequences.every((entry) => entry[1].length === 0)) {
     return (
