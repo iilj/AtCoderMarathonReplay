@@ -13,16 +13,24 @@ class ContestUserState {
   addSubmission(contestSubmission: Submission, inverted: boolean): void {
     const val = contestSubmission.score;
     if (this.taskScoreMap.has(contestSubmission.task)) {
+      // 2回目以降の提出
       const curVal = this.taskScoreMap.get(contestSubmission.task) as number;
       if (inverted) {
         // loss 増加
-        if (curVal < val || val === 0) return;
+        if (curVal === 0) {
+          // 前回も今回も 0 点なら無視する
+          if (val === 0) return;
+          // loss が増加した場合は curVal < val になるが，
+          // 前回の提出 (curVal) が 0 点で今回の提出 (val) が正の得点の場合も curVal < val になるので，
+          // curVal === 0 のみ別途判定する
+        } else if (curVal < val || val === 0) return;
       } else {
         // score 減少
         if (curVal > val) return;
       }
       this.score += val - curVal;
     } else {
+      // 初回提出
       this.score += val;
     }
     this.taskScoreMap.set(contestSubmission.task, val);

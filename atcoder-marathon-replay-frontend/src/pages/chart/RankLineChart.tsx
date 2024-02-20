@@ -51,7 +51,6 @@ export const RankLineChart: React.FC<Props> = (props) => {
 
   const rankTicks = getRankTicks(maxRank);
   const maxRankForChart = rankTicks[rankTicks.length - 1];
-  console.log(rankTicks);
 
   return (
     <div style={{ width: '100%', height: '500px', marginTop: '50px' }}>
