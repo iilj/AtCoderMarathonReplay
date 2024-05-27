@@ -40,6 +40,7 @@ const decreasingOrderContestSlugs = [
   'ahc027',
   'ahc030',
   'ahc031',
+  'ahc033',
 ];
 
 export const ChartBlock: React.FC<Props> = (props) => {
