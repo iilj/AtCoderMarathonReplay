@@ -1,0 +1,4 @@
+beautifulsoup4
+requests
+online-judge-tools
+setuptools
