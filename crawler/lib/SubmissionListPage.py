@@ -104,10 +104,17 @@ class SubmissionListPage:
                 and self.status != "WR"
             ):
                 time_consumption_str: str = table_data_list[7].get_text()
-                self.time_consumption = int(time_consumption_str.split(" ")[0])
+                # print(f"{time_consumption_str=}")
+                if time_consumption_str.startswith(">"):
+                    self.time_consumption = int(time_consumption_str.split(" ")[1])
+                else:
+                    self.time_consumption = int(time_consumption_str.split(" ")[0])
 
                 memory_consumption_str: str = table_data_list[8].get_text()
-                self.memory_consumption = int(memory_consumption_str.split(" ")[0])
+                if memory_consumption_str.startswith(">"):
+                    self.memory_consumption = int(memory_consumption_str.split(" ")[1])
+                else:
+                    self.memory_consumption = int(memory_consumption_str.split(" ")[0])
             else:
                 self.time_consumption = -1
                 self.memory_consumption = -1
